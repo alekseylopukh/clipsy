@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="3300" height="2200">
+ <g id="Notes"><text x="263" y="292">Clipsy paperclip, from App/AppIcon.icon</text></g>
+ <g id="Guides">
+  <line id="Baseline-S" x1="263" x2="3036" y1="696" y2="696" stroke="#27AAE1" stroke-width="0.5"/>
+  <line id="Capline-S" x1="263" x2="3036" y1="625.541" y2="625.541" stroke="#27AAE1" stroke-width="0.5"/>
+  <line id="Baseline-L" x1="263" x2="3036" y1="1556" y2="1556" stroke="#27AAE1" stroke-width="0.5"/>
+  <line id="Capline-L" x1="263" x2="3036" y1="1485.54" y2="1485.54" stroke="#27AAE1" stroke-width="0.5"/>
+  <line id="Baseline-M" x1="263" x2="3036" y1="1126" y2="1126" stroke="#27AAE1" stroke-width="0.5"/>
+  <line id="Capline-M" x1="263" x2="3036" y1="1055.54" y2="1055.54" stroke="#27AAE1" stroke-width="0.5"/>
+  <line id="left-margin-Regular-M" x1="1391.3" x2="1391.3" y1="1030.79" y2="1150.12" stroke="#00AEEF" stroke-width="0.5"/>
+  <line id="right-margin-Regular-M" x1="1483.898" x2="1483.898" y1="1030.79" y2="1150.12" stroke="#00AEEF" stroke-width="0.5"/>
+ </g>
+ <g id="Symbols">
+  <g id="Regular-M" transform="matrix(1 0 0 1 1391.3 1126)"><path d="M 90.885,-28.756 L 66.605,-4.475 A 38.983,38.983 0 0 1 11.475,-59.605 L 27.756,-75.886 A 5.856,5.856 0 0 1 36.038,-67.604 L 19.757,-51.323 A 27.271,27.271 0 0 0 58.323,-12.757 L 82.604,-37.037 A 5.856,5.856 0 0 1 90.885,-28.756 Z"/><path d="M 67.270,-36.372 L 50.989,-20.091 A 16.898,16.898 0 0 1 27.091,-43.989 L 51.372,-68.269 A 5.856,5.856 0 0 1 59.653,-59.988 L 35.373,-35.707 A 5.186,5.186 0 0 0 42.707,-28.373 L 58.988,-44.654 A 5.856,5.856 0 0 1 67.270,-36.372 Z"/><path d="M 19.475,-67.604 L 35.756,-83.885 A 27.940,27.940 0 0 1 75.269,-44.372 L 58.988,-28.091 A 5.856,5.856 0 0 1 50.707,-36.372 L 66.988,-52.653 A 16.228,16.228 0 0 0 44.037,-75.604 L 27.756,-59.323 A 5.856,5.856 0 0 1 19.475,-67.604 Z"/></g>
+ </g>
+</svg>
