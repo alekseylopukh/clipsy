@@ -340,7 +340,7 @@ A separate floating panel, independent of the Shelf, so the user can keep workin
 
 ## 7. Menu bar extra
 
-- Template SF Symbol: `paperclip` normally, matching the paperclip of the [app icon](#app-icon), and `pause.circle` while paused. A brief `.bounce` symbol effect on each capture; none with Reduce Motion.
+- Symbol: `clipsy.paperclip` normally, a custom symbol in `App/Assets.xcassets` whose outline is the paperclip of the [app icon](#app-icon) in one color (its three pieces merged), and the `pause.circle` SF Symbol while paused. Both are template symbols, so the menu bar tints them. A brief `.bounce` symbol effect on each capture; none with Reduce Motion.
 - Shown by default; hidden with a Settings toggle. If hidden, the global shortcut still works and launching the app again opens Settings.
 - Click shows a menu (per HIG). An opt-in setting makes a left click open the Shelf instead, with the menu on right-click / Control-click.
 
@@ -354,7 +354,7 @@ Menu contents: the items and pause durations are set in [product.md §6](product
 | Help | Clipsy Help (opens the project docs), Report an Issue |
 | Quit | Quit Clipsy (⌘Q) |
 
-Decided (T6.4, symbol changed with the app icon): `paperclip` normally and `pause.circle` while paused, swapped with the `.replace` content transition. SF Symbols on macOS 26 has no paperclip pause or slash variant.
+Decided (T6.4, symbol changed with the app icon): `clipsy.paperclip` normally and `pause.circle` while paused, swapped with the `.replace` content transition. The custom symbol has no pause variant.
 
 Decided (T7.3): the disabled line reads "Paused until 15:45", in the locale's short time format, with the abbreviated weekday when the resume time is not today. Until Resumed shows no line.
 
