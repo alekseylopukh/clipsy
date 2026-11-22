@@ -110,6 +110,7 @@ Placement uses the display's visible frame, so an auto-hidden Dock is not avoide
 - Closes on Esc, on the shortcut again, after a paste, or when the user clicks outside it. It stays open while one of its sheets (such as an editor) is attached, or while it or one of its child windows (a popover, the Quick Look preview) has keyboard focus, and closes when focus leaves both (see [product.md §4.13](product.md#413-shelf-window-behavior)).
 - Hidden from screenshots and screen sharing by default (setting in Privacy).
 - One Card is always selected while the Shelf has items; on open, the newest Card in the current view is selected.
+- Scrolls sideways with a trackpad, a horizontal wheel or Shift-wheel, and also with a plain vertical mouse wheel: over a scroll view that only scrolls horizontally (the Card strip, the Board tabs), the Shelf panel turns a vertical wheel turn into a horizontal one (`WheelRedirect`). Trackpad gestures pass through unchanged.
 
 ### Motion
 
