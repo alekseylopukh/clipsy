@@ -40,6 +40,16 @@ final class ShelfPanel: NSPanel, NSWindowDelegate {
         onCancel()
     }
 
+    override func sendEvent(_ event: NSEvent) {
+        if event.type == .scrollWheel, let contentView,
+           let redirect = WheelRedirect.horizontalEvent(for: event, in: contentView)
+        {
+            redirect.scrollView.scrollWheel(with: redirect.event)
+            return
+        }
+        super.sendEvent(event)
+    }
+
     override func keyDown(with event: NSEvent) {
         if !onKeyDown(event) {
             super.keyDown(with: event)
