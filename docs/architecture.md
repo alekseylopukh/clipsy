@@ -171,6 +171,7 @@ Rules:
 
 - GRDB `DatabaseMigrator` with named, append-only migrations (`v1_initial`, `v2_…`). A migration is never edited after it ships in a release.
 - Migrations run at launch before any UI shows. On failure the app shows an error and does not touch the database file.
+- A store with an applied migration this build does not know was written by a newer Clipsy. GRDB's migrator would accept it silently, so `AppDatabase` checks `hasBeenSuperseded` first and throws without writing; the app says a newer version saved the history and quits.
 - A damaged store is the exception: when opening or migrating fails with `SQLITE_CORRUPT` or `SQLITE_NOTADB`, the database files, `Payloads/` and `Thumbnails/` move to `Backups/Damaged Store <date time>/`, a new empty store is created, and an alert tells the user where the backup is, with a "Show in Finder" button.
 - Each migration has a test that builds the previous schema with synthetic rows, migrates, and checks the result.
 - `UserDefaults` key changes get a one-shot migration keyed by a stored settings version.

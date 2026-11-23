@@ -2,6 +2,8 @@ import Foundation
 import GRDB
 
 public struct AppDatabase: Sendable {
+    public struct SupersededError: Error {}
+
     public static func defaultDirectory(bundleIdentifier: String) -> URL {
         URL.applicationSupportDirectory.appending(
             path: bundleIdentifier == "app.gonar.clipsy" ? "Clipsy" : bundleIdentifier,
@@ -23,7 +25,13 @@ public struct AppDatabase: Sendable {
             attributes: [.posixPermissions: 0o700]
         )
         self.directory = directory
-        pool = try DatabasePool(path: directory.appending(path: "clipsy.sqlite").path(percentEncoded: false))
+        let path = directory.appending(path: "clipsy.sqlite").path(percentEncoded: false)
+        if FileManager.default.fileExists(atPath: path) {
+            // grdb's migrate() silently accepts unknown applied migrations
+            let superseded = try DatabaseQueue(path: path).read(migrator.hasBeenSuperseded)
+            guard !superseded else { throw SupersededError() }
+        }
+        pool = try DatabasePool(path: path)
         try migrator.migrate(pool)
     }
 

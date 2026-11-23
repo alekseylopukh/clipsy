@@ -857,6 +857,7 @@ Found by the 2026-11-23 audits. These come first because every later task gets f
 - Deliverable: `AppDatabase` checks `migrator.hasBeenSuperseded` before migrating and throws without touching the files; the app shows an alert and quits
 - Acceptance: test with a database that has an extra `v99` migration: the open throws and the files are unchanged
 - Size: S
+- Status: done
 
 ### T14.10 No Sparkle in the dev build
 - Module(s): Updates, App

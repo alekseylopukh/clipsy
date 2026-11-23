@@ -294,6 +294,9 @@
     "Clipsy can’t open its clipboard history." : {
       "comment" : "Title of the alert shown when the database fails to open at launch"
     },
+    "It was saved by a newer version of Clipsy. Install the latest version to open it." : {
+      "comment" : "Body of the launch alert when the clipboard history was written by a newer Clipsy"
+    },
     "Clipsy can’t open this card." : {
       "comment" : "Title of the alert shown when a card's link or file cannot be opened"
     },
