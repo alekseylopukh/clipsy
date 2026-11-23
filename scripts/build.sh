@@ -31,7 +31,7 @@ case "${1:-build}" in
       -derivedDataPath .build/DerivedData -quiet build
     sign_app ;;
   test)
-    swift test --package-path Packages/ClipsyKit --quiet ;;
+    swift test --package-path Packages/ClipsyKit --disable-xctest --quiet ;;
   *)
     echo "usage: scripts/build.sh [build|test]" >&2; exit 64 ;;
 esac

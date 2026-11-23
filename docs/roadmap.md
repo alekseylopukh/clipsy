@@ -801,6 +801,7 @@ Found by the 2026-11-23 audits. These come first because every later task gets f
 - Deliverable: `--disable-xctest` in `scripts/build.sh` test and `scripts/snapshots.sh`
 - Acceptance: both scripts pass; `scripts/test-commit-gate.sh` stays green
 - Size: S
+- Status: done
 
 ### T14.4 GitHub Actions on Node 24
 - Module(s): CI
