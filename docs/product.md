@@ -143,7 +143,7 @@ Decided (2026-11-17): the scheme is `clipsy`. Grammar (designed in T12.2):
 | `clipsy://new?text=<text>` | Opens the Shelf and the New Text Card editor for the current tab, filled with `<text>`. The card is saved only when the user saves it, so a link cannot add cards on its own. If the editor is already open, it is left as it is. |
 | `clipsy://settings` | Opens Settings. |
 
-The scheme and the route are case-insensitive. Values are percent-encoded; `+` is not read as a space. Unknown query items are ignored. Any other route, or a URL with a path, is ignored and logged without its contents.
+The scheme and the route are case-insensitive. Values are percent-encoded; `+` is not read as a space. Unknown query items are ignored. Any other route, or a URL with a path, is ignored and logged without its contents. A Debug build answers to `clipsy-dev` with the same grammar ([architecture §6.1](architecture.md#61-layout)).
 
 ## 4. Behavior rules
 

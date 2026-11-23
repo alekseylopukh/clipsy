@@ -6,6 +6,12 @@ import Updates
 final class StatusItemController: NSObject, NSMenuDelegate {
     private static let helpURL = url("https://github.com/alekseylopukh/clipsy")
     private static let issueURL = url("https://github.com/alekseylopukh/clipsy/issues/new")
+    private static let appName: String = {
+        guard let name = Bundle.main.object(forInfoDictionaryKey: "CFBundleDisplayName") as? String else {
+            fatalError("INFOPLIST_KEY_CFBundleDisplayName sets the display name in every configuration")
+        }
+        return name
+    }()
 
     private let statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
     private let iconView = NSImageView()
@@ -38,7 +44,8 @@ final class StatusItemController: NSObject, NSMenuDelegate {
         guard let button = statusItem.button else {
             fatalError("a status item created by NSStatusBar always has a button")
         }
-        button.setAccessibilityLabel(String(localized: "Clipsy", comment: "Accessibility label of the menu bar item"))
+        button.setAccessibilityLabel(Self.appName)
+        button.toolTip = Self.appName
         button.target = self
         button.action = #selector(buttonClicked)
         button.sendAction(on: [.leftMouseUp, .rightMouseUp])
@@ -153,7 +160,7 @@ final class StatusItemController: NSObject, NSMenuDelegate {
     private static func icon(isPaused: Bool) -> NSImage {
         let description = isPaused
             ? String(localized: "Capture Paused", comment: "Accessibility description of the paused menu bar symbol")
-            : String(localized: "Clipsy", comment: "Accessibility label of the menu bar item")
+            : appName
         let image = isPaused
             ? NSImage(systemSymbolName: "pause.circle", accessibilityDescription: description)
             : NSImage(named: "clipsy.paperclip")

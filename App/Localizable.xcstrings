@@ -286,7 +286,7 @@
       "comment" : "Button that dismisses a confirmation"
     },
     "Clipsy" : {
-      "comment" : "Accessibility label of the menu bar item"
+      "comment" : "The app name in the About settings"
     },
     "Clipsy can’t delete these cards." : {
       "comment" : "Title of the alert shown when deleting cards fails"

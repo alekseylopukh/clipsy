@@ -848,6 +848,7 @@ Found by the 2026-11-23 audits. These come first because every later task gets f
 - Acceptance: `URLRouteTests` cover both schemes; a Debug build's Info.plist shows the dev id and scheme; a Release build's shows the released ones (check with `plutil` on both products, without launching)
 - Human check: with the installed release running, launch the Debug build: two menu bar icons, a separate Accessibility prompt for Clipsy Dev, `clipsy-dev://open` opens Dev and `clipsy://open` opens the release
 - Size: S
+- Status: done
 
 ### T14.9 Refuse a database from a newer version
 - Module(s): Store, App

@@ -6,9 +6,9 @@ public enum URLRoute: Equatable, Sendable {
     case newTextCard(String)
     case openSettings
 
-    public init?(_ url: URL) {
+    public init?(_ url: URL, scheme: String) {
         guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false),
-              components.scheme?.lowercased() == "clipsy",
+              components.scheme?.lowercased() == scheme.lowercased(),
               components.path.isEmpty || components.path == "/",
               let host = components.host?.lowercased()
         else { return nil }

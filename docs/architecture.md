@@ -288,6 +288,16 @@ Dependency direction: `ShelfUI` → `DesignSystem`, `Pasting`, `Media`, `Store`,
 
 Decided (2026-11-17): a plain, committed `Clipsy.xcodeproj`. `App/` is a folder-synchronized group, so new files there need no project edits. The app links one umbrella product, `ClipsyKit`, so adding a module only changes `Package.swift`. Never hand-edit `project.pbxproj` unless a build setting has to change.
 
+Identity per configuration (T14.8): Release is the shipped app, Debug is "Clipsy Dev", so a dev build never shares the release's UserDefaults, URL scheme, TCC grants, LaunchServices entry or database (§3.1). The app target's build settings set:
+
+| Setting | Release | Debug |
+|---|---|---|
+| `PRODUCT_BUNDLE_IDENTIFIER` | `app.gonar.clipsy` | `app.gonar.clipsy.dev` |
+| `INFOPLIST_KEY_CFBundleDisplayName` | `Clipsy` | `Clipsy Dev` |
+| `CLIPSY_URL_SCHEME` | `clipsy` | `clipsy-dev` |
+
+`PRODUCT_NAME` stays `Clipsy` in both, so the product is `Clipsy.app`. `Config/Info.plist` declares the URL type from `$(CLIPSY_URL_SCHEME)` with `CFBundleURLName = $(PRODUCT_BUNDLE_IDENTIFIER)`. The app reads the scheme from `Bundle.main` and passes it to `URLRoute`, so the [grammar](product.md#37-integrations) is the same under either scheme. The menu bar item's accessibility label and tooltip are the bundle's display name.
+
 ### 6.2 Testing
 
 - **Unit (Swift Testing):** classifier, hashing and dedupe rules, ignore rules, size cap, retention SQL, Board deletion, FTS queries (prefix, diacritics), Sequence state machine, migrations.
