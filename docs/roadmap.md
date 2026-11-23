@@ -43,7 +43,7 @@ Not maintainer decisions. They are the doc's current text or the simplest choice
 | WD-29 | Sequence panel ([design §6](design.md#6-sequence)) | First shown at the top-right of the display under the pointer, then wherever the user moved it (AppKit frame autosave); hidden from screen sharing like the Shelf, following the Privacy pane's screenshot setting (`SequencePanelController.isShownInScreenCapture`); rows are a fixed two-line height, up to 6 visible before scrolling; the next marker is an accent dot; the trailing symbol shows the card type; ⌘Z, ⌫ and Esc work while the panel is key, which happens only when the user clicks into it |
 | WD-30 | General pane details ([product §6 General](product.md#general), [§4.4](product.md#44-retention)) | The retention slider commits when the drag ends (keyboard steps commit at once); confirmation is asked only when lowering the limit and some History card, on a board or not, is older than the new limit; raising it never purges; the hourly purge uses `ContinuousClock`, so time asleep counts; the Accessibility row's "Open System Settings…" calls the same prompt as WD-27; a login item waiting for approval shows as on, with a button that opens Login Items; Show in menu bar and the click toggle come with T6.4, the storage summary with T7.2 |
 | WD-31 | Rename details ([product §4.10](product.md#410-editing-v1)) | Rename trims whitespace; Return saves, Esc or clicking outside discards |
-| WD-32 | Card details ([design §3](design.md#3-cards)) | Cards are square and as tall as the strip; the header shows the time of the last copy; a link without a preview shows the `link` symbol with the host name under it, and the footer shows the URL truncated at the head; rich text is scaled so its most common font size becomes the body size, keeps underline and strikethrough, drops background colors, and a text color under 4.5:1 contrast on the card fill falls back to the label color; rich text wins over the code-like font; code-like text is decided by a line heuristic (`CodeLikeText`); right-clicking an unselected card acts on that card without changing the selection, as in Finder; ⌃-click does not select; image and file cards show their type symbol while the thumbnail or icons load; thumbnails are made when an image Card is first shown (not at capture), at most 800 px on the long side, and the checkerboard is drawn only for images with an alpha channel; a file Card shows the workspace icon of each of its first three files |
+| WD-32 | Card details ([design §3](design.md#3-cards)) | Cards are square and as tall as the strip; the header shows the time of the last copy; a link without a preview shows the `link` symbol with the host name under it, and the footer shows the host without `www.`; rich text is scaled so its most common font size becomes the body size, keeps underline and strikethrough, drops background colors, and a text color under 4.5:1 contrast on the card fill falls back to the label color; rich text wins over the code-like font; code-like text is decided by a line heuristic (`CodeLikeText`); right-clicking an unselected card acts on that card without changing the selection, as in Finder; ⌃-click does not select; image and file cards show their type symbol while the thumbnail or icons load; thumbnails are made when an image Card is first shown (not at capture), at most 800 px on the long side, and the checkerboard is drawn only for images with an alpha channel; a file Card shows the workspace icon of each of its first three files |
 | WD-33 | Privacy pane details ([product §6 Privacy](product.md#privacy), [design §8 Privacy](design.md#privacy)) | Ignored Apps keep the order they were added in, adding an app twice does nothing, and removing the Passwords preset is remembered; ⌫ removes the selected apps; the picker opens in /Applications and allows several apps; an app without a bundle ID is refused with an alert, because rule 3 skips it anyway (WD-23); an app that is no longer installed shows its bundle ID and a generic icon; the screenshot toggle sets the Shelf's and the Sequence panel's `sharingType` to `.readOnly` or `.none` at once; Show link previews, Recognize text in images and the clipboard access row come with T9.2, T9.1 and T6.5 |
 | WD-34 | Sounds ([product §3.2](product.md#32-shelf-and-cards), [§4.5](product.md#45-paste-mechanics)) | Our own synthesized sounds in `App/Sounds` (regenerate with `scripts/generate-sounds.py`): a short high tick when a card is captured, a soft falling pop after a paste or copy from the shelf; played at system output volume through `NSSound`; a sound already playing is not restarted; the toggle takes effect at once; the capture sound plays from the app's single consumer of `PasteboardMonitor.capturedCardIDs`, which T6.4's bounce shares |
 | WD-35 | Menu bar extra details ([design §7](design.md#7-menu-bar-extra)) | An `NSStatusItem`, because SwiftUI's `MenuBarExtra` cannot open the Shelf on a left click; with that setting on, right-click or Control-click shows the menu; Pause Capture is a single item until T7.3 adds the durations, and the pause lasts until resumed or the app quits (T7.3 makes it survive relaunch); Clipsy Help opens the project README and Report an Issue opens a new GitHub issue; AppKit opens Settings through the app menu item the `Settings` scene installs; launching the app again opens Settings only while the item is hidden; the bounce shares the capture sound's single consumer of `capturedCardIDs` (WD-34), so T11.5 has to fan the stream out; VoiceOver announces pause and resume |
@@ -514,7 +514,7 @@ What exists:
 - Module(s): Media, ShelfUI
 - Depends on: T3.6
 - Spec: [design Quick Look](design.md#quick-look), [design per-type layouts](design.md#per-type-layouts), [architecture §8](architecture.md#8-open-questions)
-- Deliverable: Space toggles a popover anchored to the card; `QLPreviewView` for files and images, SwiftUI views for text, links, colors; arrows move the preview; the shelf stays open; `QLThumbnailGenerator` thumbnails for file cards, cached, fanned stack for multiple files
+- Deliverable: Space toggles a popover anchored to the card; `QLPreviewView` for files, own views for images, text, links and colors; arrows move the preview; the shelf stays open; `QLThumbnailGenerator` thumbnails for file cards, cached, fanned stack for multiple files
 - Acceptance: test `missingFileFallsBackToIcon`; prototype result (popover inside a non-activating panel) noted in design.md
 - Human check: preview of a PDF, an image, rich text and a color
 - Size: M
@@ -545,7 +545,7 @@ What exists:
 - Module(s): Store, ShelfUI
 - Depends on: T5.1
 - Spec: [product §4.10](product.md#410-editing-v1), [design edit sheet](design.md#edit-sheet)
-- Deliverable: ⌘R or click on the title opens a rename popover; empty title clears it; search row updated. Duplicate is not part of this task (see "Needs the maintainer"). WD-31
+- Deliverable: ⌘R or click on the title opens a rename popover; empty title clears it; search row updated. Duplicate is not in v1 (see "Needs the maintainer"). WD-31
 - Acceptance: tests `emptyTitleClears`, `renameUpdatesSearchRow`
 - Note: the card view (T3.5) was not on this branch yet, so the popover ships as the `cardRenamePopover(for:)` modifier; T8.4 applies it to the card and makes the header title a button that sends `CardCommand.rename`
 - Size: S
@@ -758,7 +758,7 @@ What exists:
 - Module(s): CI
 - Depends on: T13.2
 - Spec: [architecture §6.4](architecture.md#64-release-pipeline), [CONTRIBUTING releases](../CONTRIBUTING.md#releases)
-- Deliverable: workflow on `v*` tags that imports the certificate into a temporary keychain, runs the scripts and creates the GitHub Release with DMG and zip
+- Deliverable: workflow on `vX.Y.Z` tags that imports the certificate into a temporary keychain, runs the scripts and creates the GitHub Release with DMG and zip
 - Acceptance: workflow lints clean; names every required secret in CONTRIBUTING.md
 - Human check: maintainer adds the Developer ID certificate, App Store Connect API key and Sparkle private key as secrets and runs the first tagged release
 - Size: M
@@ -779,14 +779,15 @@ Found while writing this roadmap. Tasks that hit one stop and ask.
 
 Decided:
 - **URL scheme** (T12.2): the maintainer approved the `clipsy` scheme and the grammar in [product §3.7](product.md#37-integrations) on 2026-11-17.
+- **Appcast URL, Sparkle keys, signing and notarization secrets** (T13.1, T13.3): the appcast URL is in [architecture §6.4](architecture.md#64-release-pipeline); the release secrets were set on 2026-11-23 ([CONTRIBUTING](../CONTRIBUTING.md#release-secrets)).
+- **Duplicate** ([product §3.2](product.md#32-shelf-and-cards)): dropped from v1 on 2026-11-23. `card.content_hash` is `UNIQUE` ([architecture §3.2](architecture.md#32-schema)), so a copy needs its own rule, for example a salted hash that capture dedupe ignores.
 
-- **Duplicate vs. unique hash:** `card.content_hash` is `UNIQUE` ([architecture §3.2](architecture.md#32-schema)), so the v1 Duplicate feature ([product §3.2](product.md#32-shelf-and-cards)) cannot create a copy. Decide the rule, then schedule Duplicate after T8.3.
-- **Appcast URL, Sparkle keys, signing and notarization secrets** (T13.1, T13.3).
 - **Linking package products into the app** without editing `project.pbxproj` (WD-20): if a third-party module must be imported by the app target directly, the link is a one-time Xcode action.
 
 ## Later (not scheduled)
 
 - Image editing: rotate, remove background ([product §3.2](product.md#32-shelf-and-cards))
+- Duplicate a card, with its own dedupe rule ([Needs the maintainer](#needs-the-maintainer))
 - System Spotlight indexing of board cards ([product §3.7](product.md#37-integrations))
-- Other shelf edges and a vertical list layout ([design §12](design.md#12-open-questions))
+- Other shelf edges and a vertical list layout ([design §2](design.md#placement-and-size))
 - Homebrew cask ([architecture §6.4](architecture.md#64-release-pipeline))
