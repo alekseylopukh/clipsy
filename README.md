@@ -15,8 +15,12 @@ Clipsy keeps everything you copy on a shelf at the bottom of the screen: text, l
 - Paste directly into the frontmost app, or as plain text
 - Quick paste with numbered shortcuts
 - Sequential pasting of several items
-- Privacy controls: ignored apps, password managers, concealed content and text that looks like a secret are skipped
-- Everything stays on your Mac. No account, no telemetry, no sync.
+- Editing of text, link and color cards, and custom card titles
+- Search inside images through on-device text recognition
+- Optional link previews
+- Privacy controls: ignored apps, password managers, concealed and transient content and text that looks like a secret are skipped; capture can be paused from the menu bar
+- Shortcuts actions and a `clipsy://` URL scheme
+- No account, no telemetry, no sync. Your history stays on your Mac; the only network requests are link previews and update checks, and both are off until you turn them on.
 
 The full behavior is described in [docs/product.md](docs/product.md).
 
@@ -30,14 +34,20 @@ macOS 26 or later.
 2. Open the disk image and drag Clipsy to Applications.
 3. Open Clipsy from Applications. It runs in the menu bar and has no Dock icon.
 
-Releases are signed with a Developer ID and notarized by Apple, so macOS opens them without a warning.
+Releases are signed with a Developer ID and notarized by Apple. On first launch macOS shows its usual "downloaded from the Internet" confirmation and no "unidentified developer" block.
+
+### Using Clipsy
+
+Press ⇧⌘V to show or hide the shelf. This takes over "Paste and Match Style" in apps that use that shortcut; change it in Settings › Shortcuts. ⇧⌘C starts a Sequence and ⌃⌥⌘V pastes every card in it. All shortcuts are listed in the [keyboard map](docs/product.md#5-keyboard-map).
 
 ### Permissions
 
-- **Accessibility** lets Clipsy paste straight into the app you were using. Without it, Clipsy puts the item on the clipboard and you press ⌘V yourself. Grant it in System Settings › Privacy & Security › Accessibility.
-- **Clipboard access:** if macOS asks whether Clipsy may read the clipboard, allow it always. Otherwise Clipsy cannot see what you copy.
+- **Accessibility** lets Clipsy paste straight into the app you were using. A Sequence started from another app also needs it to copy your selection. Without it, Clipsy puts the item on the clipboard and you press ⌘V yourself. Grant it in System Settings › Privacy & Security › Accessibility. If you skip it, Clipsy asks again on the first paste; choose "Don't ask again" to stay in copy-only mode.
+- **Paste from Other Apps:** macOS may ask before Clipsy reads what you copy, or block it. Set Clipsy to Allow in System Settings › Privacy & Security › Paste from Other Apps, or your history will miss items.
 
-The first-launch window walks through both and can be skipped.
+On first launch a short setup window lets you set the shelf shortcut, asks for Accessibility, asks for clipboard access if macOS restricts it, and offers Open at login, history length and link previews. Every step can be skipped.
+
+If pasting stops working after an update or a reinstall, remove Clipsy from the Accessibility list and add it again. macOS ties the permission to the app's signature.
 
 ### Updates
 
@@ -45,7 +55,10 @@ Clipsy never checks for updates on its own unless you turn on automatic checks i
 
 ### Uninstall
 
-Quit Clipsy from its menu bar menu, then move it from Applications to the Trash. Your history and boards stay in `~/Library/Application Support/Clipsy/`; delete that folder to remove them too.
+1. If Clipsy opens at login, turn that off in Settings › General.
+2. Quit Clipsy from its menu bar menu, then move it from Applications to the Trash.
+3. To remove your data too, delete `~/Library/Application Support/Clipsy/` (history, boards, images and backups) and run `defaults delete app.gonar.clipsy` (settings and shortcuts).
+4. To clear its permissions, run `tccutil reset Accessibility app.gonar.clipsy` and remove Clipsy from Paste from Other Apps in System Settings.
 
 ## Building from source
 
@@ -59,7 +72,7 @@ scripts/build.sh test   # run the tests
 open .build/DerivedData/Build/Products/Debug/Clipsy.app
 ```
 
-A Debug build is signed ad hoc and needs no Apple developer account.
+A Debug build needs no Apple developer account. Without an Apple Development identity it stays signed ad hoc, and macOS asks for Accessibility again after each rebuild. Set `CLIPSY_SIGN_IDENTITY=-` to force an ad-hoc signature.
 
 Release builds are made by `scripts/release/release.sh`, which needs the maintainer's signing and notarization secrets. `scripts/release/release.sh --dry-run <version> <build-number>` runs the whole pipeline without them. See [architecture §6.4](docs/architecture.md#64-release-pipeline).
 

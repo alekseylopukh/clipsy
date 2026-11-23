@@ -30,7 +30,7 @@ The git pre-commit hook lints staged Swift files. CI runs the same checks on eve
 
 - The rules and the review checklist are in [.claude/rules/code-rules.md](.claude/rules/code-rules.md). Reviews cite rule IDs such as `R2.3`.
 - Before opening a pull request, run `scripts/lint.sh`, build the app and run the tests.
-- Claude Code users get the same rules automatically through [CLAUDE.md](CLAUDE.md). A hook there blocks commits until the `pre-commit-review` skill passes.
+- Claude Code users get the same rules automatically through [CLAUDE.md](CLAUDE.md). Claude Code sessions also run a hook ([.claude/settings.json](.claude/settings.json)) that blocks commits until the `pre-commit-review` skill approves the staged tree. The plain git hook only lints.
 
 ## Workflow: GitHub Flow
 
@@ -47,21 +47,21 @@ Commit types: `feat`, `fix`, `perf`, `refactor`, `docs`, `test`, `build`, `ci`, 
 
 - Versions follow [Semantic Versioning](https://semver.org). Releases are tagged `vMAJOR.MINOR.PATCH` on `main`, for example `v0.1.0`.
 - Only maintainers create tags. Each tag gets a GitHub Release with a signed and notarized build attached.
-- Release notes are generated from merged pull requests and grouped by label (see [.github/release.yml](.github/release.yml)). Label your pull request so it lands in the right section.
+- Release notes are generated from merged pull requests and grouped by label (see [.github/release.yml](.github/release.yml)): `enhancement` goes under New features, `bug` under Bug fixes, `breaking` under Breaking changes, and everything else under Other changes. `skip-changelog` leaves a pull request out. Label your pull request so it lands in the right section.
 - A hotfix for an old version gets a `release/vX.Y` branch cut from that tag. This is needed only when `main` has moved on.
 - Pushing the tag runs [.github/workflows/release.yml](.github/workflows/release.yml). It imports the certificate into a temporary keychain, runs `scripts/release/release.sh` with the tag's version and the run number as the build number, and creates the GitHub Release with the DMG, the zip and `appcast.xml`. The steps are in [architecture §6.4](docs/architecture.md#64-release-pipeline).
 
 ### Release checklist
 
-A maintainer works through this list for every release.
+A maintainer works through this list for every release. For the first release, skip the key match in step 1 and the update test in step 8: there is no earlier release, and `appcast.sh` starts a new feed.
 
 1. All [release secrets](#release-secrets) are set, and `SPARKLE_PUBLIC_ED_KEY` matches the private key that signed earlier releases. A new key pair breaks updates for everyone on an older version.
-2. `main` is green in CI, and the merged pull requests since the last tag carry release-note labels.
+2. `main` is green in CI, and the merged pull requests since the last tag carry release-note labels. CI on pull requests only lints, so also run the **Build** workflow (Actions › Build › Run workflow) on the release commit: it builds and tests with the same Xcode as the release.
 3. `scripts/release/release.sh --dry-run <version> 1` passes locally.
 4. The manual checklist in [architecture §6.2](docs/architecture.md#62-testing) passes on a Debug build of the release commit (an ad-hoc signed Release build does not launch, see [architecture §6.4](docs/architecture.md#64-release-pipeline)).
 5. Docs match the release: the README feature list, [product.md](docs/product.md) and the open questions in each doc under `docs/`.
 6. Tag `vX.Y.Z` on `main` and push the tag. Wait for the release workflow to finish.
-7. Check the published release: the DMG opens and Clipsy launches from Applications without a Gatekeeper warning (`spctl --assess --type execute -v /Applications/Clipsy.app` says "Notarized Developer ID"), and the release lists the DMG, the zip and `appcast.xml`.
+7. Check the published release: the DMG opens and Clipsy launches from Applications with only the usual "downloaded from the Internet" confirmation, no "unidentified developer" block (`spctl --assess --type execute -v /Applications/Clipsy.app` says "Notarized Developer ID"), and the release lists the DMG, the zip and `appcast.xml`.
 8. Update test: an older installed version finds the new one with "Check for Updates…" in Settings › About, installs it and relaunches.
 9. Edit the generated release notes if needed.
 
