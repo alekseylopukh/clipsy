@@ -784,6 +784,7 @@ Found by the 2026-11-23 audits. These come first because every later task gets f
 - Deliverable: the shortest settle that still makes the test fail when the glass-contrast fix is reverted (prove it by reverting locally, never commit the revert); pixels read through `CGImage` bitmap data; drop `.serialized` only if `SnapshotRenderer` holds no shared state
 - Acceptance: the suite runs in under 6 s locally; reverting the fix still fails it
 - Size: S
+- Status: done
 
 ### T14.2 Performance tests run on demand
 - Module(s): StoreTests, scripts, CONTRIBUTING

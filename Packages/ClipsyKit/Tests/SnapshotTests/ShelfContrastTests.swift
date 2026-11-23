@@ -8,7 +8,6 @@ import Testing
 
 /// card text must keep label colors on the shelf; glass around the content made it vibrant and invisible
 @MainActor
-@Suite(.serialized)
 final class ShelfContrastTests {
     private let suiteName = "ShelfContrastTests-\(UUID().uuidString)"
     private let fixtures: SnapshotFixtures
@@ -55,7 +54,6 @@ final class ShelfContrastTests {
         }
     }
 
-    /// counts opaque, neutral pixels in the label color: dark in light mode, light in dark mode
     private func labelPixelCount(
         showing card: CardSummary,
         appearance: SnapshotRenderer.Appearance
@@ -98,19 +96,45 @@ final class ShelfContrastTests {
             root,
             appearance: appearance,
             size: CGSize(width: 600, height: DesignTokens.shelfDefaultHeight),
-            settle: .seconds(2)
+            settle: .milliseconds(100)
         )
+        return try labelPixelCount(in: rep, appearance: appearance)
+    }
+
+    /// counts opaque, neutral pixels in the label color: dark in light mode, light in dark mode
+    private func labelPixelCount(in rep: NSBitmapImageRep, appearance: SnapshotRenderer.Appearance) throws -> Int {
+        let image = try #require(rep.cgImage)
+        let width = image.width
+        let height = image.height
+        var pixels = [UInt8](repeating: 0, count: width * height * 4)
+        let colorSpace = try #require(CGColorSpace(name: CGColorSpace.sRGB))
+        let drawn = pixels.withUnsafeMutableBytes { buffer in
+            guard let context = CGContext(
+                data: buffer.baseAddress,
+                width: width,
+                height: height,
+                bitsPerComponent: 8,
+                bytesPerRow: width * 4,
+                space: colorSpace,
+                bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
+            ) else { return false }
+            context.draw(image, in: CGRect(x: 0, y: 0, width: width, height: height))
+            return true
+        }
+        try #require(drawn)
+        let darkCeiling = 89
+        let lightFloor = 166
         var count = 0
-        for y in 0 ..< rep.pixelsHigh {
-            for x in 0 ..< rep.pixelsWide {
-                guard let color = rep.colorAt(x: x, y: y)?.usingColorSpace(.sRGB), color.alphaComponent > 0.95 else {
-                    continue
-                }
-                let channels = [color.redComponent, color.greenComponent, color.blueComponent]
-                guard let low = channels.min(), let high = channels.max(), high - low < 0.08 else { continue }
-                if appearance == .light ? high < 0.35 : low > 0.65 {
-                    count += 1
-                }
+        for offset in stride(from: 0, to: pixels.count, by: 4) {
+            guard pixels[offset + 3] > 242 else { continue }
+            let red = Int(pixels[offset])
+            let green = Int(pixels[offset + 1])
+            let blue = Int(pixels[offset + 2])
+            let low = min(red, green, blue)
+            let high = max(red, green, blue)
+            guard high - low <= 20 else { continue }
+            if appearance == .light ? high <= darkCeiling : low >= lightFloor {
+                count += 1
             }
         }
         return count
