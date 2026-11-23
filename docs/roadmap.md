@@ -820,6 +820,7 @@ Found by the 2026-11-23 audits. These come first because every later task gets f
 - Deliverable: the dynamic `swiftlint` binary with SourceKit available on the runner (from the same release zip, or `swift-actions/setup-swift`); the smoke test fails the job when a file with `print(` passes or when the output contains "Skipping enabled rule"
 - Acceptance: the Lint job runs every rule; the smoke test catches `print(`
 - Size: S
+- Status: done
 
 ### T14.6 Parallel CI Build
 - Module(s): CI, docs

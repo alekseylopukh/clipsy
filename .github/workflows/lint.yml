@@ -33,16 +33,30 @@ jobs:
           curl -fsSLo swiftformat.zip "https://github.com/nicklockwood/SwiftFormat/releases/download/${SWIFTFORMAT_VERSION}/swiftformat_linux.zip"
           echo "$SWIFTLINT_SHA256  swiftlint.zip" | sha256sum -c -
           echo "$SWIFTFORMAT_SHA256  swiftformat.zip" | sha256sum -c -
-          unzip -q -o swiftlint.zip swiftlint-static && mv swiftlint-static bin/swiftlint
+          unzip -q -o swiftlint.zip swiftlint && mv swiftlint bin/swiftlint
           unzip -q -o swiftformat.zip swiftformat_linux && mv swiftformat_linux bin/swiftformat
           chmod +x bin/swiftlint bin/swiftformat
           echo "$RUNNER_TEMP/bin" >> "$GITHUB_PATH"
+          # the dynamic swiftlint loads SourceKit from the runner's preinstalled Swift toolchain
+          swift_lib="$(dirname "$(dirname "$(readlink -f "$(command -v swift)")")")/lib"
+          [ -f "$swift_lib/libsourcekitdInProc.so" ] || { echo "::error::libsourcekitdInProc.so not found in $swift_lib"; exit 1; }
+          echo "LINUX_SOURCEKIT_LIB_PATH=$swift_lib" >> "$GITHUB_ENV"
       - name: Smoke-test tools
         run: |
-          printf 'let answer = 42\n' > "$RUNNER_TEMP/Smoke.swift"
+          smoke="$RUNNER_TEMP/smoke" && mkdir -p "$smoke"
+          printf 'let answer = 42\n' > "$smoke/Clean.swift"
+          printf 'func greet() {\n    print("hi")\n}\n' > "$smoke/Print.swift"
           swiftlint version && swiftformat --version
-          swiftformat --lint --config .swiftformat "$RUNNER_TEMP/Smoke.swift"
-          swiftlint lint --strict --config .swiftlint.yml "$RUNNER_TEMP/Smoke.swift"
+          swiftformat --lint --config .swiftformat "$smoke/Clean.swift"
+          swiftlint lint --strict --config .swiftlint.yml "$smoke/Clean.swift" > "$smoke/clean.log" 2>&1 || { cat "$smoke/clean.log"; exit 1; }
+          cat "$smoke/clean.log"
+          if grep -qE 'Skipping enabled rule|sourcekitd has failed' "$smoke/clean.log"; then
+            echo "::error::SwiftLint skips SourceKit rules"; exit 1
+          fi
+          if swiftlint lint --strict --config .swiftlint.yml "$smoke/Print.swift" > "$smoke/print.log" 2>&1; then
+            cat "$smoke/print.log"; echo "::error::SwiftLint passed a file with print("; exit 1
+          fi
+          grep -q '(no_print)' "$smoke/print.log" || { cat "$smoke/print.log"; echo "::error::no_print did not fire"; exit 1; }
       - name: Lint
         run: scripts/lint.sh
       - name: ShellCheck release scripts
