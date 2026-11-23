@@ -866,6 +866,7 @@ Found by the 2026-11-23 audits. These come first because every later task gets f
 - Deliverable: one factory picks the driver and both call sites use it (`SparkleUpdaterDriver()` is created in App/ClipsyApp.swift and App/SettingsView.swift today); when the bundle id is not `app.gonar.clipsy` it returns a no-op `UpdaterDriver`, and "Check for Updates…" and the About updates section are hidden
 - Acceptance: unit test for the driver choice
 - Size: S
+- Status: done
 
 ### T14.11 Dev default hotkeys
 - Module(s): ShelfUI

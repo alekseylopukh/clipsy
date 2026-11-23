@@ -101,7 +101,9 @@ final class StatusItemController: NSObject, NSMenuDelegate {
         }
         menu.addItem(.separator())
         menu.addItem(item(String(localized: "Settings…"), action: #selector(openSettings), key: ","))
-        menu.addItem(item(String(localized: "Check for Updates…"), action: #selector(checkForUpdates)))
+        if updater.isAvailable {
+            menu.addItem(item(String(localized: "Check for Updates…"), action: #selector(checkForUpdates)))
+        }
         menu.addItem(item(String(localized: "About Clipsy"), action: #selector(showAbout)))
         menu.addItem(.separator())
         menu.addItem(item(String(localized: "Clipsy Help"), action: #selector(openHelp)))

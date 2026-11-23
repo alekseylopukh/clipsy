@@ -41,22 +41,24 @@ struct AboutSettingsView: View {
                 .buttonStyle(.link)
             }
 
-            Section {
-                Toggle(
-                    "Automatically check for updates",
-                    isOn: Binding(get: { updater.automaticallyChecksForUpdates }, set: setAutomaticChecks)
-                )
-                LabeledContent {
-                    Button("Check for Updates…", action: checkForUpdates)
-                } label: {
-                    EmptyView()
+            if updater.isAvailable {
+                Section {
+                    Toggle(
+                        "Automatically check for updates",
+                        isOn: Binding(get: { updater.automaticallyChecksForUpdates }, set: setAutomaticChecks)
+                    )
+                    LabeledContent {
+                        Button("Check for Updates…", action: checkForUpdates)
+                    } label: {
+                        EmptyView()
+                    }
+                } header: {
+                    Text("Updates")
+                } footer: {
+                    FormFootnote(Text(
+                        "Clipsy looks for a new version on GitHub only when you check or turn on automatic checks."
+                    ))
                 }
-            } header: {
-                Text("Updates")
-            } footer: {
-                FormFootnote(Text(
-                    "Clipsy looks for a new version on GitHub only when you check or turn on automatic checks."
-                ))
             }
         }
         .formStyle(.grouped)

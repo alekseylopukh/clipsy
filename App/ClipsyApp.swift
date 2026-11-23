@@ -125,7 +125,7 @@ struct ClipsyApp: App {
     }
 
     private static func startUpdater() -> AppUpdater {
-        let updater = AppUpdater(driver: SparkleUpdaterDriver())
+        let updater = AppUpdater(bundle: .main)
         do {
             try updater.startIfAutomatic()
         } catch {

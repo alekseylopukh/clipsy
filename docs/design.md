@@ -408,7 +408,7 @@ The recorder rejects combinations already used by the app, by a menu item or by 
 
 ### About
 
-App icon, name, version and build, "Free and open-source under GPL-3.0", links: Source Code, Report an Issue, Acknowledgements (third-party licenses, shown in a sheet from `App/Credits.rtf`). An Updates section with an "Automatically check for updates" toggle (off by default) and a Check for Updates… button.
+App icon, name, version and build, "Free and open-source under GPL-3.0", links: Source Code, Report an Issue, Acknowledgements (third-party licenses, shown in a sheet from `App/Credits.rtf`). An Updates section with an "Automatically check for updates" toggle (off by default) and a Check for Updates… button. The dev build has no updater and no Updates section.
 
 Decided (T13.1, WD-19): update settings live in About.
 There is no Advanced pane; capture polling and the size limit are fixed ([WD-1](roadmap.md#working-defaults-for-open-todos), [product §4.1](product.md#41-capture)).

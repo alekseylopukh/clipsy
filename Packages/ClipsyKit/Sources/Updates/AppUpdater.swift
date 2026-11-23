@@ -10,6 +10,10 @@ public final class AppUpdater {
         self.driver = driver
     }
 
+    public var isAvailable: Bool {
+        driver.isAvailable
+    }
+
     /// sparkle owns this setting in the app's user defaults
     public var automaticallyChecksForUpdates: Bool {
         access(keyPath: \.automaticallyChecksForUpdates)
