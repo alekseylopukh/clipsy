@@ -874,6 +874,7 @@ Found by the 2026-11-23 audits. These come first because every later task gets f
 - Deliverable: in the dev build the defaults are ⌃⇧⌘V (Shelf) and ⌃⇧⌘C (Sequence) and paste-all has none; check they collide with no system shortcut
 - Acceptance: unit test for both builds' defaults
 - Size: S
+- Status: done
 
 ### T14.12 Test target warnings
 - Module(s): Package.swift, DesignSystem, ShelfUI tests

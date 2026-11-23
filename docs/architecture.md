@@ -299,6 +299,8 @@ Identity per configuration (T14.8): Release is the shipped app, Debug is "Clipsy
 
 `PRODUCT_NAME` stays `Clipsy` in both, so the product is `Clipsy.app`. `Config/Info.plist` declares the URL type from `$(CLIPSY_URL_SCHEME)` with `CFBundleURLName = $(PRODUCT_BUNDLE_IDENTIFIER)`. The app reads the scheme from `Bundle.main` and passes it to `URLRoute`, so the [grammar](product.md#37-integrations) is the same under either scheme. The menu bar item's accessibility label and tooltip are the bundle's display name.
 
+Global shortcut defaults (T14.11) follow the bundle id, so a dev build never takes the release's hotkeys: `app.gonar.clipsy` uses the [keyboard map](product.md#5-keyboard-map) defaults, any other id uses ⌃⇧⌘V (Shelf) and ⌃⇧⌘C (Start Sequence) and leaves Paste All unset. Neither dev combination is a macOS symbolic hotkey (checked with `CopySymbolicHotKeys` on macOS 27.2). A default is written only while UserDefaults holds no value for the name, so a dev build that already stored the release defaults keeps them until Restore Defaults.
+
 ### 6.2 Testing
 
 - **Unit (Swift Testing):** classifier, hashing and dedupe rules, ignore rules, size cap, retention SQL, Board deletion, FTS queries (prefix, diacritics), Sequence state machine, migrations.

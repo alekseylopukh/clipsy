@@ -354,6 +354,8 @@ Working default [WD-28](roadmap.md#working-defaults-for-open-todos): badges appe
 | Paste next Sequence card | ⌘V (the system shortcut; not registered by us) | v1 |
 | Paste all Sequence cards | ⌃⌥⌘V | v1 |
 
+These are the released app's defaults; the dev build uses [its own](architecture.md#61-layout) so both can run at once.
+
 Decided (2026-11-17): the default shelf shortcut is ⇧⌘V. It takes "Paste and Match Style" away from apps that use it, and users can rebind it in Settings.
 
 Decided (2026-11-17): the default Sequence shortcut is ⇧⌘C (rebindable). It shadows ⇧⌘C in Finder, in browser dev tools and in some editors.
