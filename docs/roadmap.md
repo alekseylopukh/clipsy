@@ -880,6 +880,7 @@ Found by the 2026-11-23 audits. These come first because every later task gets f
 - Deliverable: exclude `App/AppIcon.icon` in the SnapshotTests target; `nonisolated static` for the pure helpers in `SwatchValueLabel.swift` and `CardFooter.swift`; the filter tests keep the function-key bit a real arrow press carries (see the comment in ShelfModel+Filters.swift) without calling the deprecated `.function` symbol, for example through `EventModifiers(rawValue:)` with a one-line comment
 - Acceptance: `swift build --build-tests` prints no warnings
 - Size: S
+- Status: done
 
 ## Needs the maintainer
 

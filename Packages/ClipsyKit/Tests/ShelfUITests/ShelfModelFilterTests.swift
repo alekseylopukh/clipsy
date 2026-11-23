@@ -5,6 +5,9 @@ import Synchronization
 import Testing
 @testable import ShelfUI
 
+/// 64 is the deprecated .function bit that a real arrow press still carries
+private let arrowPress: EventModifiers = [.numericPad, EventModifiers(rawValue: 64)]
+
 @MainActor
 final class ShelfModelFilterTests {
     private let suiteName = "ShelfModelFilterTests-\(UUID().uuidString)"
@@ -133,7 +136,7 @@ final class ShelfModelFilterTests {
         #expect(model.moveSuggestionHighlight(.next) == false)
     }
 
-    @Test(arguments: [EventModifiers(), [.numericPad, .function]])
+    @Test(arguments: [EventModifiers(), arrowPress])
     func `arrow keys move the suggestion highlight`(modifiers: EventModifiers) {
         let model = makeModel()
         model.isSearchFieldFocused = true
@@ -154,7 +157,7 @@ final class ShelfModelFilterTests {
         let model = makeModel()
         model.query = "last"
 
-        #expect(model.handleSearchFieldArrow(.next, modifiers: [modifier, .numericPad, .function]) == false)
+        #expect(model.handleSearchFieldArrow(.next, modifiers: arrowPress.union(modifier)) == false)
         #expect(model.highlightedSuggestion == nil)
     }
 
@@ -163,8 +166,8 @@ final class ShelfModelFilterTests {
         model.isSearchFieldFocused = true
         model.query = "x"
 
-        #expect(model.handleSearchFieldArrow(.previous, modifiers: [.numericPad, .function]) == false)
-        #expect(model.handleSearchFieldArrow(.next, modifiers: [.numericPad, .function]))
+        #expect(model.handleSearchFieldArrow(.previous, modifiers: arrowPress) == false)
+        #expect(model.handleSearchFieldArrow(.next, modifiers: arrowPress))
         #expect(model.isSearchFieldFocused == false)
     }
 

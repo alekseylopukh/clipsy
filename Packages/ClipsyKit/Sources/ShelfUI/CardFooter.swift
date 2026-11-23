@@ -56,7 +56,7 @@ struct CardFooter: View {
         }
     }
 
-    static func displayHost(_ host: String) -> String {
+    nonisolated static func displayHost(_ host: String) -> String {
         host.hasPrefix("www.") ? String(host.dropFirst("www.".count)) : host
     }
 }

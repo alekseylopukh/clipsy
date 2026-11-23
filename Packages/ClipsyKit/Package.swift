@@ -42,7 +42,7 @@ let package = Package(
             dependencies: ["Capture", "DesignSystem", "Media", "Pasting", "ShelfUI", "Store", "Updates"],
             // `App` is a symlink to the app target's folder; a new file there belongs in `sources` or `exclude`
             exclude: [
-                "App/AppDelegate.swift", "App/ClipsyApp.swift", "App/ClipsyApp+URLScheme.swift",
+                "App/AppDelegate.swift", "App/AppIcon.icon", "App/ClipsyApp.swift", "App/ClipsyApp+URLScheme.swift",
                 "App/PasteboardAccessAlert.swift", "App/SettingsWindow.swift", "App/StatusItemController.swift",
                 "App/Intents", "App/Sounds", "App/Credits.rtf", "App/Localizable.xcstrings"
             ],
