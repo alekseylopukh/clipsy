@@ -792,6 +792,7 @@ Found by the 2026-11-23 audits. These come first because every later task gets f
 - Deliverable: the suite runs only when `CLIPSY_PERF=1`; `scripts/perf.sh` runs it alone and prints the timings; architecture §6.2 and the CONTRIBUTING release checklist call `scripts/perf.sh` and compare with the baseline
 - Acceptance: `scripts/build.sh test` no longer runs it; `scripts/perf.sh` does
 - Size: S
+- Status: done
 
 ### T14.3 No empty XCTest phase
 - Module(s): scripts

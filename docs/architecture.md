@@ -293,7 +293,7 @@ Decided (2026-11-17): a plain, committed `Clipsy.xcodeproj`. `App/` is a folder-
 - **Unit (Swift Testing):** classifier, hashing and dedupe rules, ignore rules, size cap, retention SQL, Board deletion, FTS queries (prefix, diacritics), Sequence state machine, migrations.
 - **Pasteboard tests** use private named pasteboards (`NSPasteboard(name:)`), never `.general`.
 - **Fixtures are synthetic.** Never build test data from real clipboard content.
-- **Performance:** seed 100k synthetic Cards, measure search latency and launch time. `PerformanceTests` in `StoreTests` does this on every `scripts/build.sh test` and prints the timings; run it alone with `swift test --package-path Packages/ClipsyKit --filter PerformanceTests` for numbers worth comparing.
+- **Performance:** seed 100k synthetic Cards, measure search latency and launch time. `PerformanceTests` in `StoreTests` does this only when `CLIPSY_PERF=1`, so `scripts/build.sh test` skips it. Run `scripts/perf.sh` before every release and when a change touches the schema or search, and compare its timings with the baseline below.
 - **Manual checklist per release:** direct paste into a native app, a browser, a terminal and an Electron app; non-QWERTY layout; full-screen Space; second display; Accessibility revoked; screen recording hides the Shelf.
 
 Baseline (2026-11-17, Apple M5 Pro, macOS 27.2, debug build, run alone): 100k text and link Cards with 13 words each in History. Search times are the median of five runs.

@@ -53,17 +53,18 @@ Commit types: `feat`, `fix`, `perf`, `refactor`, `docs`, `test`, `build`, `ci`, 
 
 ### Release checklist
 
-A maintainer works through this list for every release. For the first release, skip the key match in step 1 and the update test in step 8: there is no earlier release, and `appcast.sh` starts a new feed.
+A maintainer works through this list for every release. For the first release, skip the key match in step 1 and the update test in step 9: there is no earlier release, and `appcast.sh` starts a new feed.
 
 1. All [release secrets](#release-secrets) are set, and `SPARKLE_PUBLIC_ED_KEY` matches the private key that signed earlier releases. A new key pair breaks updates for everyone on an older version.
 2. `main` is green in CI, and the merged pull requests since the last tag carry release-note labels. CI on pull requests only lints, so also run the **Build** workflow (Actions › Build › Run workflow) on the release commit: it builds and tests with the same Xcode as the release.
 3. `scripts/release/release.sh --dry-run <version> 1` passes locally.
-4. The manual checklist in [architecture §6.2](docs/architecture.md#62-testing) passes on a Debug build of the release commit (an ad-hoc signed Release build does not launch, see [architecture §6.4](docs/architecture.md#64-release-pipeline)).
-5. Docs match the release: the README feature list, [product.md](docs/product.md) and the open questions in each doc under `docs/`.
-6. Tag `vX.Y.Z` on `main` and push the tag. Wait for the release workflow to finish.
-7. Check the published release: the DMG opens and Clipsy launches from Applications with only the usual "downloaded from the Internet" confirmation, no "unidentified developer" block (`spctl --assess --type execute -v /Applications/Clipsy.app` says "Notarized Developer ID"), and the release lists the DMG, the zip and `appcast.xml`.
-8. Update test: an older installed version finds the new one with "Check for Updates…" in Settings › About, installs it and relaunches.
-9. Edit the generated release notes if needed.
+4. `scripts/perf.sh` prints timings close to the [performance baseline](docs/architecture.md#62-testing); a clear regression is fixed first or the baseline is updated with the reason.
+5. The manual checklist in [architecture §6.2](docs/architecture.md#62-testing) passes on a Debug build of the release commit (an ad-hoc signed Release build does not launch, see [architecture §6.4](docs/architecture.md#64-release-pipeline)).
+6. Docs match the release: the README feature list, [product.md](docs/product.md) and the open questions in each doc under `docs/`.
+7. Tag `vX.Y.Z` on `main` and push the tag. Wait for the release workflow to finish.
+8. Check the published release: the DMG opens and Clipsy launches from Applications with only the usual "downloaded from the Internet" confirmation, no "unidentified developer" block (`spctl --assess --type execute -v /Applications/Clipsy.app` says "Notarized Developer ID"), and the release lists the DMG, the zip and `appcast.xml`.
+9. Update test: an older installed version finds the new one with "Check for Updates…" in Settings › About, installs it and relaunches.
+10. Edit the generated release notes if needed.
 
 ### Release secrets
 
