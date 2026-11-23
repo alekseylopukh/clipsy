@@ -39,19 +39,13 @@ final class MarketingSnapshotTests {
         let model = makeModel()
         model.receive(fixtures.history)
         model.receiveBoards(fixtures.boards)
+        let photo = try MarketingFixtures.landscape(width: 520, height: 400, palette: .morning)
         let root = try MarketingDesktop(size: Self.desktop, appearance: appearance) {
             VStack(spacing: 0) {
-                MarketingWindow(title: "Trip Notes") {
-                    VStack(alignment: .leading, spacing: 20) {
-                        Text(verbatim: "Weekend Plans")
-                            .font(.system(size: 26, weight: .bold))
-                        MarketingPlaceholderText(widths: [560, 610, 480, 590, 300])
-                        MarketingPlaceholderText(widths: [600, 520, 575, 340])
-                    }
-                    .padding(.horizontal, 40)
-                    .padding(.top, 12)
+                MarketingWindow(title: "Lisbon Weekend") {
+                    TripNote(photo: photo)
                 }
-                .frame(width: 760, height: 380)
+                .frame(width: 760, height: 330)
                 .padding(.top, 72)
                 Spacer(minLength: 0)
                 shelf(model)
@@ -105,7 +99,7 @@ final class MarketingSnapshotTests {
                 .padding(.top, 110)
                 SequencePanelView(model: panel)
                     .frame(width: DesignTokens.sequencePanelWidth)
-                    .background(GlassStandIn(cornerRadius: DesignTokens.sequencePanelCornerRadius))
+                    .background(MarketingGlass(cornerRadius: DesignTokens.sequencePanelCornerRadius))
                     .padding(DesignTokens.sequencePanelScreenInset)
                     .padding(.top, 28)
             }
@@ -121,6 +115,7 @@ final class MarketingSnapshotTests {
                 VStack(spacing: 0) {
                     SettingsToolbar()
                     PrivacySettingsView()
+                        .toggleStyle(ActiveSwitchStyle())
                         .environment(PrivacySettings(defaults: defaults))
                         .environment(PasteboardAccess(pasteboard: AllowingPasteboard(), defaults: defaults))
                 }
@@ -198,7 +193,7 @@ final class MarketingSnapshotTests {
             representations: representations,
             thumbnails: ThumbnailCache(directory: fixtures.thumbnails)
         ))
-        .background(GlassStandIn())
+        .background(MarketingGlass())
     }
 }
 
@@ -227,6 +222,67 @@ private struct SettingsToolbar: View {
             }
         }
         .padding(.bottom, 8)
+    }
+}
+
+private struct TripNote: View {
+    let photo: CGImage
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 32) {
+            VStack(alignment: .leading, spacing: 14) {
+                Text(verbatim: "Lisbon, Friday to Sunday")
+                    .font(.system(size: 24, weight: .bold))
+                Text(
+                    verbatim: "Arrive 10:40, check in after 3 PM.\nSaturday: tram up to the castle, dinner by the river."
+                )
+                .font(.system(size: 14))
+                .lineSpacing(4)
+                VStack(alignment: .leading, spacing: 9) {
+                    item("Book the river table", done: true)
+                    item("Download offline maps", done: true)
+                    item("Pack the camera charger", done: false)
+                    item("Tram 28 tickets", done: false)
+                }
+                .padding(.top, 4)
+            }
+            Image(decorative: photo, scale: 2)
+                .resizable()
+                .frame(width: 260, height: 200)
+                .clipShape(.rect(cornerRadius: 10))
+        }
+        .padding(.horizontal, 36)
+        .padding(.top, 14)
+    }
+
+    private func item(_ title: String, done: Bool) -> some View {
+        HStack(spacing: 8) {
+            Image(systemName: done ? "checkmark.circle.fill" : "circle")
+                .foregroundStyle(done ? Color.orange : Color.secondary)
+            Text(verbatim: title)
+                .foregroundStyle(done ? .secondary : .primary)
+        }
+        .font(.system(size: 14))
+    }
+}
+
+/// an offscreen app is never active, so system switches draw grey; this draws them as an active window shows them
+private struct ActiveSwitchStyle: ToggleStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        LabeledContent {
+            Capsule()
+                .fill(configuration.isOn ? AnyShapeStyle(Color.accentColor) : AnyShapeStyle(.quaternary))
+                .frame(width: 36, height: 16)
+                .overlay(alignment: configuration.isOn ? .trailing : .leading) {
+                    Capsule()
+                        .fill(.white)
+                        .shadow(color: .black.opacity(0.2), radius: 1, y: 0.5)
+                        .frame(width: 22, height: 13)
+                        .padding(.horizontal, 1.5)
+                }
+        } label: {
+            configuration.label
+        }
     }
 }
 

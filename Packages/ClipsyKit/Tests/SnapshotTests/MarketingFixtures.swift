@@ -1,4 +1,5 @@
 import AppKit
+import CoreImage
 import Foundation
 import ImageIO
 import Store
@@ -27,7 +28,7 @@ struct MarketingFixtures {
         let now = Date.now
         try Self.png(Self.landscape(width: 1200, height: 630, palette: .dusk))
             .write(to: thumbnails.appending(path: "21.png"))
-        try Self.png(Self.shapes(width: 1200, height: 630)).write(to: thumbnails.appending(path: "25.png"))
+        try Self.png(Self.styleGuidePreview(width: 1200, height: 630)).write(to: thumbnails.appending(path: "25.png"))
         let photo = try Self.png(Self.landscape(width: 1600, height: 1067, palette: .morning))
         let itinerary = directory.appending(path: "Lisbon Itinerary.pdf")
         try Self.itineraryPDF(at: itinerary)
@@ -267,42 +268,27 @@ extension MarketingFixtures {
         }
     }
 
-    static func shapes(width: Int, height: Int) throws -> CGImage {
+    /// a style guide's link preview: a large "Aa" over the board's teal
+    static func styleGuidePreview(width: Int, height: Int) throws -> CGImage {
         try draw(width: width, height: height) { context, size in
             fill(
                 context,
                 size: size,
-                colors: [rgb(0.93, 0.95, 0.98), rgb(0.82, 0.90, 0.95)],
-                from: .zero,
-                to: CGPoint(x: size.width, y: size.height)
+                colors: [rgb(0.19, 0.69, 0.78), rgb(0.27, 0.36, 0.86)],
+                from: CGPoint(x: 0, y: size.height),
+                to: CGPoint(x: size.width, y: 0)
             )
-            let blocks: [(CGRect, NSColor)] = [
-                (CGRect(x: 0.08, y: 0.62, width: 0.5, height: 0.12), rgb(0.19, 0.69, 0.78)),
-                (CGRect(x: 0.08, y: 0.44, width: 0.78, height: 0.06), rgb(0.62, 0.70, 0.80)),
-                (CGRect(x: 0.08, y: 0.33, width: 0.7, height: 0.06), rgb(0.62, 0.70, 0.80)),
-                (CGRect(x: 0.08, y: 0.22, width: 0.56, height: 0.06), rgb(0.62, 0.70, 0.80))
-            ]
-            for (rect, color) in blocks {
-                let frame = CGRect(
-                    x: rect.minX * size.width, y: rect.minY * size.height,
-                    width: rect.width * size.width, height: rect.height * size.height
-                )
-                context.addPath(CGPath(
-                    roundedRect: frame,
-                    cornerWidth: frame.height / 2,
-                    cornerHeight: frame.height / 2,
-                    transform: nil
-                ))
-                context.setFillColor(color.cgColor)
-                context.fillPath()
-            }
-            context.setFillColor(rgb(0.37, 0.36, 0.90).cgColor)
-            context.fillEllipse(in: CGRect(
-                x: size.width * 0.74,
-                y: size.height * 0.56,
-                width: size.height * 0.26,
-                height: size.height * 0.26
-            ))
+            NSGraphicsContext.saveGraphicsState()
+            NSGraphicsContext.current = NSGraphicsContext(cgContext: context, flipped: false)
+            NSAttributedString(string: "Aa", attributes: [
+                .font: NSFont.systemFont(ofSize: size.height * 0.42, weight: .bold),
+                .foregroundColor: NSColor.white
+            ]).draw(at: CGPoint(x: size.width * 0.08, y: size.height * 0.30))
+            NSAttributedString(string: "Writing Style Guide", attributes: [
+                .font: NSFont.systemFont(ofSize: size.height * 0.08, weight: .semibold),
+                .foregroundColor: NSColor.white.withAlphaComponent(0.85)
+            ]).draw(at: CGPoint(x: size.width * 0.09, y: size.height * 0.16))
+            NSGraphicsContext.restoreGraphicsState()
         }
     }
 
@@ -324,6 +310,18 @@ extension MarketingFixtures {
         body(context, CGSize(width: width, height: height))
         guard let image = context.makeImage() else { throw SnapshotFixtures.FixtureError.drawingFailed }
         return image
+    }
+
+    static func blurred(_ image: CGImage, radius: Double, saturation: Double = 1) throws -> CGImage {
+        let input = CIImage(cgImage: image)
+        let output = input.clampedToExtent()
+            .applyingGaussianBlur(sigma: radius)
+            .applyingFilter("CIColorControls", parameters: [kCIInputSaturationKey: saturation])
+            .cropped(to: input.extent)
+        let colorSpace = CGColorSpace(name: CGColorSpace.sRGB) ?? CGColorSpaceCreateDeviceRGB()
+        guard let result = CIContext().createCGImage(output, from: input.extent, format: .RGBA8, colorSpace: colorSpace)
+        else { throw SnapshotFixtures.FixtureError.drawingFailed }
+        return result
     }
 
     static func fill(_ context: CGContext, size: CGSize, colors: [NSColor], from start: CGPoint, to end: CGPoint) {
