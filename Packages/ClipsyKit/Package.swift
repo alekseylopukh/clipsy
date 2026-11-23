@@ -50,6 +50,7 @@ let package = Package(
                 "AppSnapshotTests.swift", "ComponentGallerySnapshotTests.swift", "PopoverSnapshotTests.swift",
                 "SearchSuggestionLayerTests.swift", "ShelfContrastTests.swift", "ShelfSnapshotTests.swift",
                 "SnapshotFixtures.swift", "SnapshotRenderer.swift",
+                "MarketingDesktop.swift", "MarketingFixtures.swift", "MarketingSnapshotTests.swift",
                 "App/SettingsView.swift", "App/GeneralSettingsView.swift", "App/ShortcutsSettingsView.swift",
                 "App/PrivacySettingsView.swift", "App/AboutSettingsView.swift", "App/AcknowledgementsView.swift",
                 "App/OnboardingView.swift", "App/PermissionStatusLabel.swift", "App/MenuBarSettings.swift",
