@@ -5,18 +5,6 @@ import Testing
 
 @MainActor
 struct WheelRedirectTests {
-    @Test func `a vertical wheel turn becomes the same horizontal one`() throws {
-        let event = try Self.wheel(vertical: -3)
-
-        WheelRedirect.swapAxes(of: event)
-
-        #expect(event.getIntegerValueField(.scrollWheelEventDeltaAxis1) == 0)
-        #expect(event.getIntegerValueField(.scrollWheelEventDeltaAxis2) == -3)
-        let swapped = try #require(NSEvent(cgEvent: event))
-        #expect(swapped.scrollingDeltaY == 0)
-        #expect(swapped.scrollingDeltaX != 0)
-    }
-
     @Test(arguments: [NSScroller.Style.overlay, .legacy], [false, true])
     func `a SwiftUI strip that overflows sideways scrolls only horizontally`(
         style: NSScroller.Style,
@@ -45,29 +33,43 @@ struct WheelRedirectTests {
         #expect(WheelRedirect.scrollsOnlyHorizontally(scrollView) == false)
     }
 
-    @Test func `a wheel turn over the strip is redirected, a trackpad gesture is not`() throws {
-        let (host, _) = try Self.host(ScrollView(.horizontal) {
-            Color.red.frame(width: 2000, height: 100)
-        })
-        // an event without a window reports its screen location, flipped against the main display
-        let point = CGPoint(x: 200, y: CGDisplayBounds(CGMainDisplayID()).height - 50)
-        let wheel = try Self.wheel(vertical: -3, at: point)
-        let gesture = try Self.wheel(vertical: -3, at: point)
-        gesture.setIntegerValueField(.scrollWheelEventScrollPhase, value: Int64(NSEvent.Phase.changed.rawValue))
+    @Test(arguments: [CGScrollEventUnit.line, .pixel])
+    func `a wheel turn over the strip becomes the same horizontal one`(units: CGScrollEventUnit) throws {
+        let host = try Self.strip()
+        let wheelEvent = try #require(NSEvent(cgEvent: Self.wheel(vertical: -3, units: units, at: Self.overStrip)))
 
-        let wheelEvent = try #require(NSEvent(cgEvent: wheel))
-        let gestureEvent = try #require(NSEvent(cgEvent: gesture))
-        let redirected = try #require(WheelRedirect.horizontalEvent(for: wheelEvent, in: host))
-        let passed = WheelRedirect.horizontalEvent(for: gestureEvent, in: host)
+        let (scrollView, redirected) = try #require(WheelRedirect.horizontalEvent(for: wheelEvent, in: host))
 
-        #expect(redirected.scrollingDeltaX != 0)
+        #expect(scrollView === Self.find(in: host))
+
+        #expect(redirected.scrollingDeltaX == wheelEvent.scrollingDeltaY)
         #expect(redirected.scrollingDeltaY == 0)
-        #expect(passed == nil)
+        #expect(redirected.hasPreciseScrollingDeltas == wheelEvent.hasPreciseScrollingDeltas)
     }
 
-    private static func wheel(vertical: Int32, at point: CGPoint = .zero) throws -> CGEvent {
+    @Test func `a trackpad gesture over the strip is left alone`() throws {
+        let host = try Self.strip()
+        let gesture = try Self.wheel(vertical: -3, units: .pixel, at: Self.overStrip)
+        gesture.setIntegerValueField(.scrollWheelEventScrollPhase, value: Int64(NSEvent.Phase.changed.rawValue))
+        let gestureEvent = try #require(NSEvent(cgEvent: gesture))
+
+        #expect(WheelRedirect.horizontalEvent(for: gestureEvent, in: host) == nil)
+    }
+
+    private static var overStrip: CGPoint {
+        // an event without a window reports its screen location, flipped against the main display
+        CGPoint(x: 200, y: CGDisplayBounds(CGMainDisplayID()).height - 50)
+    }
+
+    private static func strip() throws -> NSView {
+        try host(ScrollView(.horizontal) {
+            Color.red.frame(width: 2000, height: 100)
+        }).0
+    }
+
+    private static func wheel(vertical: Int32, units: CGScrollEventUnit, at point: CGPoint) throws -> CGEvent {
         let event = try #require(CGEvent(
-            scrollWheelEvent2Source: nil, units: .line, wheelCount: 2, wheel1: vertical, wheel2: 0, wheel3: 0
+            scrollWheelEvent2Source: nil, units: units, wheelCount: 2, wheel1: vertical, wheel2: 0, wheel3: 0
         ))
         event.location = point
         return event

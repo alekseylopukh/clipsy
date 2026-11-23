@@ -42,9 +42,9 @@ final class ShelfPanel: NSPanel, NSWindowDelegate {
 
     override func sendEvent(_ event: NSEvent) {
         if event.type == .scrollWheel, let contentView,
-           let horizontal = WheelRedirect.horizontalEvent(for: event, in: contentView)
+           let redirect = WheelRedirect.horizontalEvent(for: event, in: contentView)
         {
-            super.sendEvent(horizontal)
+            redirect.scrollView.scrollWheel(with: redirect.event)
             return
         }
         super.sendEvent(event)
