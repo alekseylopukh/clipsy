@@ -62,7 +62,7 @@ Clipsy never checks for updates on its own unless you turn on automatic checks i
 
 ## Building from source
 
-Requires macOS 26 and Xcode 26 or later. Swift packages (GRDB, KeyboardShortcuts, Sparkle) are fetched on the first build.
+Requires macOS 26 and Xcode 27.2 or later. Swift packages (GRDB, KeyboardShortcuts, Sparkle) are fetched on the first build.
 
 ```bash
 git clone https://github.com/alekseylopukh/clipsy.git
