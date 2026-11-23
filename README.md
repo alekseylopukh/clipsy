@@ -49,7 +49,7 @@ Quit Clipsy from its menu bar menu, then move it from Applications to the Trash.
 
 ## Building from source
 
-Requires macOS 26 and Xcode 26 or later. Swift packages (GRDB, KeyboardShortcuts, Sparkle) are fetched on the first build.
+Requires macOS 26 and Xcode 27.2 or later. Swift packages (GRDB, KeyboardShortcuts, Sparkle) are fetched on the first build.
 
 ```bash
 git clone https://github.com/alekseylopukh/clipsy.git
