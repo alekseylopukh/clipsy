@@ -14,6 +14,7 @@ final class StatusItemController: NSObject, NSMenuDelegate {
     private let settings: MenuBarSettings
     private let updater: AppUpdater
     private let openShelf: () -> Void
+    private let newTextCard: () -> Void
     private let startSequence: () -> Void
     private var isShowingPaused: Bool
 
@@ -22,12 +23,14 @@ final class StatusItemController: NSObject, NSMenuDelegate {
         settings: MenuBarSettings,
         updater: AppUpdater,
         openShelf: @escaping () -> Void,
+        newTextCard: @escaping () -> Void,
         startSequence: @escaping () -> Void
     ) {
         self.pause = pause
         self.settings = settings
         self.updater = updater
         self.openShelf = openShelf
+        self.newTextCard = newTextCard
         self.startSequence = startSequence
         isShowingPaused = pause.isPaused
         super.init()
@@ -72,6 +75,7 @@ final class StatusItemController: NSObject, NSMenuDelegate {
         let openShelfItem = item(String(localized: "Open Shelf"), action: #selector(openShelfChosen))
         openShelfItem.setShortcut(for: .toggleShelf)
         menu.addItem(openShelfItem)
+        menu.addItem(item(String(localized: "New Text Card"), action: #selector(newTextCardChosen)))
         let startSequenceItem = item(String(localized: "Start Sequence"), action: #selector(startSequenceChosen))
         startSequenceItem.setShortcut(for: .startSequence)
         menu.addItem(startSequenceItem)
@@ -181,6 +185,10 @@ final class StatusItemController: NSObject, NSMenuDelegate {
 
     @objc private func openShelfChosen() {
         openShelf()
+    }
+
+    @objc private func newTextCardChosen() {
+        newTextCard()
     }
 
     @objc private func startSequenceChosen() {

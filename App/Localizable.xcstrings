@@ -164,7 +164,7 @@
       "extractionState" : "manual"
     },
     "New Text Card" : {
-      "comment" : "Shelf More menu item that opens the editor for a new text card",
+      "comment" : "Shelf More menu item and menu bar menu item that open the editor for a new text card",
       "extractionState" : "manual"
     },
     "Start Sequence" : {

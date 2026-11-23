@@ -75,6 +75,7 @@ struct ClipsyApp: App {
             settings: menuBarSettings,
             updater: updater,
             openShelf: { shelf.show() },
+            newTextCard: { shelf.showNewTextCard(text: "") },
             startSequence: { sequence.start(shelfSelection: shelf.selectedCardIDs) }
         )
         _statusItem = State(initialValue: statusItem)
