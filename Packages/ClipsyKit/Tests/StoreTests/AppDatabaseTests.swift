@@ -10,6 +10,15 @@ struct AppDatabaseTests {
         database = try AppDatabase.temporary()
     }
 
+    @Test(arguments: [
+        (bundleIdentifier: "app.gonar.clipsy", folder: "Clipsy"),
+        (bundleIdentifier: "app.gonar.clipsy.dev", folder: "app.gonar.clipsy.dev")
+    ])
+    func `default directory derives from the bundle id`(bundleIdentifier: String, folder: String) {
+        let expected = URL.applicationSupportDirectory.appending(path: folder, directoryHint: .isDirectory)
+        #expect(AppDatabase.defaultDirectory(bundleIdentifier: bundleIdentifier) == expected)
+    }
+
     @Test func `migration creates all tables`() throws {
         let names = try database.pool.read { connection in
             try String.fetchSet(connection, sql: "SELECT name FROM sqlite_master WHERE type IN ('table', 'index')")

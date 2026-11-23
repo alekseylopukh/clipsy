@@ -2,10 +2,12 @@ import Foundation
 import GRDB
 
 public struct AppDatabase: Sendable {
-    public static let defaultDirectory = URL.applicationSupportDirectory.appending(
-        path: "Clipsy",
-        directoryHint: .isDirectory
-    )
+    public static func defaultDirectory(bundleIdentifier: String) -> URL {
+        URL.applicationSupportDirectory.appending(
+            path: bundleIdentifier == "app.gonar.clipsy" ? "Clipsy" : bundleIdentifier,
+            directoryHint: .isDirectory
+        )
+    }
 
     public let directory: URL
     let pool: DatabasePool

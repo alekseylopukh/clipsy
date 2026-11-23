@@ -295,8 +295,10 @@ struct ClipsyApp: App {
     /// migrations must finish before any UI shows (architecture §3.4), so this runs synchronously at launch
     private static func openDatabase() -> AppDatabase {
         let logger = Logger(subsystem: "app.gonar.clipsy", category: "Startup")
+        guard let bundleIdentifier = Bundle.main.bundleIdentifier else { fatalError("the app has a bundle id") }
         do {
-            let opened = try AppDatabase.openRecoveringDamagedStore(directory: AppDatabase.defaultDirectory)
+            let directory = AppDatabase.defaultDirectory(bundleIdentifier: bundleIdentifier)
+            let opened = try AppDatabase.openRecoveringDamagedStore(directory: directory)
             if let backup = opened.backupDirectory {
                 logger.error("the database was damaged and was moved aside")
                 showRecoveryAlert(backup: backup)

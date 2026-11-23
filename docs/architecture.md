@@ -97,7 +97,7 @@ Local-only. No sync fields, no UUIDs, no tombstones: integer row IDs are enough.
   Backups/Damaged Store <date time>/           a damaged store moved aside at launch (§3.4)
 ```
 
-Working default [WD-18](roadmap.md#working-defaults-for-open-todos): the directory is `~/Library/Application Support/Clipsy/` (`AppDatabase.defaultDirectory`).
+Working default [WD-18](roadmap.md#working-defaults-for-open-todos): `AppDatabase.defaultDirectory(bundleIdentifier:)` derives the directory from the app's bundle id. The released id `app.gonar.clipsy` keeps `~/Library/Application Support/Clipsy/`, so released data stays where it is; any other id, such as a dev build's, uses `~/Library/Application Support/<bundle id>/`, so it never shares the release's database.
 
 ### 3.2 Schema
 

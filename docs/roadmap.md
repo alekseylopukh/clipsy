@@ -29,7 +29,7 @@ Not maintainer decisions. They are the doc's current text or the simplest choice
 | WD-15 | Compact threshold | Regular card height below 150 pt |
 | WD-16 | System Settings deep links | Use a pane URL only if verified on macOS 26; otherwise open System Settings and say where to go |
 | WD-17 | Own-write marker type | `app.gonar.clipsy.own-write`, declared in `Store` so `Capture` and `Pasting` share it |
-| WD-18 | App Support folder | `~/Library/Application Support/Clipsy/` |
+| WD-18 | App Support folder | `~/Library/Application Support/Clipsy/` for `app.gonar.clipsy`; `~/Library/Application Support/<bundle id>/` for any other id ([architecture §3.1](architecture.md#31-files)) |
 | WD-19 | Update settings location | About pane |
 | WD-20 | Linking new modules into the app | One library product `ClipsyKit` lists every package target; the app links only it. A third-party module reaches the app through a ClipsyKit module that re-exports it with `@_exported import` (KeyboardShortcuts through `ShelfUI`). If the app must link a third-party product directly, stop and ask the maintainer to link it in Xcode. |
 | WD-21 | Clipboard previous contents after paste | Not restored; no `currentHostOnly` |
@@ -837,6 +837,7 @@ Found by the 2026-11-23 audits. These come first because every later task gets f
 - Deliverable: the directory derives from the bundle id: `app.gonar.clipsy` keeps `Clipsy` (released data stays where it is), any other id uses a folder named after the id; architecture §3.1 and WD-18 updated
 - Acceptance: unit tests for both ids; the release path is unchanged
 - Size: S
+- Status: done
 
 ### T14.8 Debug runs as Clipsy Dev
 - Module(s): App, ShelfUI, build settings
