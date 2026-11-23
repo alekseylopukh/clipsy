@@ -773,6 +773,107 @@ What exists:
 - Size: S
 - Status: done
 
+## M14. Developer speed and a separate dev build (0.2.0)
+
+Found by the 2026-11-23 audits. These come first because every later task gets faster and safer with them. Measured baseline: local `swift test` 46 s, CI Build 6m37s (app 2m18s, then tests 3m52s, ClipsyKit compiled twice).
+
+### T14.1 Faster ShelfContrastTests
+- Module(s): SnapshotTests
+- Depends on: none
+- Spec: `ShelfContrastTests` renders 4 cases twice each with a 2 s settle (16 s of sleep, about 27 s in all) and reads pixels with `NSColor.colorAt`
+- Deliverable: the shortest settle that still makes the test fail when the glass-contrast fix is reverted (prove it by reverting locally, never commit the revert); pixels read through `CGImage` bitmap data; drop `.serialized` only if `SnapshotRenderer` holds no shared state
+- Acceptance: the suite runs in under 6 s locally; reverting the fix still fails it
+- Size: S
+
+### T14.2 Performance tests run on demand
+- Module(s): StoreTests, scripts, CONTRIBUTING
+- Depends on: none
+- Spec: `PerformanceTests` seeds 100k cards once and times 6 queries × 5 runs in every `swift test` (10 s locally, about 30 s in CI), asserting only result counts; [architecture §6.2](architecture.md#62-testing)
+- Deliverable: the suite runs only when `CLIPSY_PERF=1`; `scripts/perf.sh` runs it alone and prints the timings; architecture §6.2 and the CONTRIBUTING release checklist call `scripts/perf.sh` and compare with the baseline
+- Acceptance: `scripts/build.sh test` no longer runs it; `scripts/perf.sh` does
+- Size: S
+
+### T14.3 No empty XCTest phase
+- Module(s): scripts
+- Depends on: none
+- Spec: no test target uses XCTest, yet `swift test` spends about 5 s in an empty XCTest run
+- Deliverable: `--disable-xctest` in `scripts/build.sh` test and `scripts/snapshots.sh`
+- Acceptance: both scripts pass; `scripts/test-commit-gate.sh` stays green
+- Size: S
+
+### T14.4 GitHub Actions on Node 24
+- Module(s): CI
+- Depends on: none
+- Spec: `actions/checkout@v4` and `actions/cache@v4` run on the deprecated Node 20 (annotation in every run)
+- Deliverable: `actions/checkout@v7` and `actions/cache@v6` in lint.yml, build.yml and release.yml; release.yml keeps `persist-credentials: false`; verify the newest major versions with `gh api repos/actions/<name>/releases/latest` first
+- Acceptance: workflows lint clean (`actionlint` if available); no Node 20 annotation on the next run
+- Size: S
+
+### T14.5 SwiftLint with SourceKit in CI
+- Module(s): CI
+- Depends on: T14.4
+- Spec: lint.yml installs `swiftlint-static`, which skips `custom_rules` (the `no_print` privacy rule) and `statement_position` ("Skipping enabled rule … requires SourceKit")
+- Deliverable: the dynamic `swiftlint` binary with SourceKit available on the runner (from the same release zip, or `swift-actions/setup-swift`); the smoke test fails the job when a file with `print(` passes or when the output contains "Skipping enabled rule"
+- Acceptance: the Lint job runs every rule; the smoke test catches `print(`
+- Size: S
+
+### T14.6 Parallel CI Build
+- Module(s): CI, docs
+- Depends on: T14.3, T14.4
+- Spec: build.yml compiles ClipsyKit twice in a row (xcodebuild, then `swift test`) and `--quiet` hides test timings; a transient SwiftPM clone failure needed a full rerun
+- Deliverable: two parallel jobs, `app` (scripts/build.sh) and `test` (`swift package resolve` retried up to 3 times, then `swift test --disable-xctest` without `--quiet`), each with its own cache; architecture §6.3 matches
+- Acceptance: the Build workflow passes on the branch; wall time noted in the PR
+- Size: S
+
+### T14.7 Data directory from the bundle id
+- Module(s): Store, App
+- Depends on: none
+- Spec: `AppDatabase.defaultDirectory` hardcodes `Application Support/Clipsy` (`AppDatabase.swift:5-8`), so the Debug build and the installed release share one database
+- Deliverable: the directory derives from the bundle id: `app.gonar.clipsy` keeps `Clipsy` (released data stays where it is), any other id uses a folder named after the id; architecture §3.1 and WD-18 updated
+- Acceptance: unit tests for both ids; the release path is unchanged
+- Size: S
+
+### T14.8 Debug runs as Clipsy Dev
+- Module(s): App, ShelfUI, build settings
+- Depends on: T14.7
+- Spec: Debug and Release share `app.gonar.clipsy`, so UserDefaults, the `clipsy://` scheme, TCC grants and LaunchServices collide
+- Deliverable: build settings in project.pbxproj (only build settings are edited there): in Debug `PRODUCT_BUNDLE_IDENTIFIER = app.gonar.clipsy.dev` and `INFOPLIST_KEY_CFBundleDisplayName = Clipsy Dev`; a new `CLIPSY_URL_SCHEME` setting, `clipsy` in Release and `clipsy-dev` in Debug. Config/Info.plist uses `$(CLIPSY_URL_SCHEME)` and `CFBundleURLName = $(PRODUCT_BUNDLE_IDENTIFIER)`; the scheme is passed to `URLRoute` (ShelfUI/URLRoute.swift) and the app reads it from `Bundle.main`; the menu bar accessibility label and tooltip (App/StatusItemController.swift) say "Clipsy Dev" in dev. `PRODUCT_NAME` stays `Clipsy`. docs/architecture.md describes it; CLAUDE.md Identity only links there
+- Acceptance: `URLRouteTests` cover both schemes; a Debug build's Info.plist shows the dev id and scheme; a Release build's shows the released ones (check with `plutil` on both products, without launching)
+- Human check: with the installed release running, launch the Debug build: two menu bar icons, a separate Accessibility prompt for Clipsy Dev, `clipsy-dev://open` opens Dev and `clipsy://open` opens the release
+- Size: S
+
+### T14.9 Refuse a database from a newer version
+- Module(s): Store, App
+- Depends on: T14.7
+- Spec: GRDB's migrator silently accepts applied migrations it does not know, so an older app can run on a newer schema; [architecture §3.4](architecture.md#34-migrations)
+- Deliverable: `AppDatabase` checks `migrator.hasBeenSuperseded` before migrating and throws without touching the files; the app shows an alert and quits
+- Acceptance: test with a database that has an extra `v99` migration: the open throws and the files are unchanged
+- Size: S
+
+### T14.10 No Sparkle in the dev build
+- Module(s): Updates, App
+- Depends on: T14.8
+- Spec: Debug uses the release feed and a placeholder key; opting in from Debug would change the shared defaults
+- Deliverable: one factory picks the driver and both call sites use it (`SparkleUpdaterDriver()` is created in App/ClipsyApp.swift and App/SettingsView.swift today); when the bundle id is not `app.gonar.clipsy` it returns a no-op `UpdaterDriver`, and "Check for Updates…" and the About updates section are hidden
+- Acceptance: unit test for the driver choice
+- Size: S
+
+### T14.11 Dev default hotkeys
+- Module(s): ShelfUI
+- Depends on: T14.8
+- Spec: both builds register ⇧⌘V, ⇧⌘C and ⌃⌥⌘V
+- Deliverable: in the dev build the defaults are ⌃⇧⌘V (Shelf) and ⌃⇧⌘C (Sequence) and paste-all has none; check they collide with no system shortcut
+- Acceptance: unit test for both builds' defaults
+- Size: S
+
+### T14.12 Test target warnings
+- Module(s): Package.swift, DesignSystem, ShelfUI tests
+- Depends on: none
+- Spec: test builds warn about 5 unhandled files from the `App/AppIcon.icon` symlink, 3 `#ActorIsolatedCall` and deprecated `EventModifiers.function`
+- Deliverable: exclude `App/AppIcon.icon` in the SnapshotTests target; `nonisolated static` for the pure helpers in `SwatchValueLabel.swift` and `CardFooter.swift`; the filter tests keep the function-key bit a real arrow press carries (see the comment in ShelfModel+Filters.swift) without calling the deprecated `.function` symbol, for example through `EventModifiers(rawValue:)` with a one-line comment
+- Acceptance: `swift build --build-tests` prints no warnings
+- Size: S
+
 ## Needs the maintainer
 
 Found while writing this roadmap. Tasks that hit one stop and ask.

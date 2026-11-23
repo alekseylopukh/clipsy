@@ -24,12 +24,14 @@ if (!opts.branch || /^(main|master)$/.test(opts.branch)) {
 
 const MAIN = `the main checkout (the Clipsy git repository in the current working directory; \`git rev-parse --show-toplevel\` from there)`
 
-const DECISIONS = `Maintainer decisions (2026-11-17). They replace the roadmap's "Needs the maintainer" list; record each one in the doc it belongs to the first time a task depends on it:
-- Duplicate vs. unique hash: content_hash is NOT unique. Capture dedupe looks up the newest History card with the same hash and moves it to the top instead of inserting. Duplicate (product §3.2) inserts a copy with the same hash; implement it as part of T8.3. Change the schema in the existing migration while nothing is released.
-- URL scheme: "clipsy". Design the grammar yourself (for example clipsy://open, clipsy://search?q=, clipsy://board/<name>), document it in docs/product.md and implement it.
-- Releases: appcast at https://github.com/alekseylopukh/clipsy/releases/latest/download/appcast.xml. Signing identity, notarization credentials and the Sparkle EdDSA private key come from environment variables or CI secrets that the maintainer provides later. Implement scripts and workflows that read them and fail with a clear message when they are missing. The public Sparkle key goes into a build setting with a placeholder value. Add a "Human check" item for every secret the maintainer must supply. These tasks are not blocked.
-- Linking: the app links only the ClipsyKit product. Re-export what the app needs from ClipsyKit (\`@_exported import\`). If a third-party product truly must be linked to the app target, a minimal project.pbxproj edit is allowed; verify it with scripts/build.sh.
-- Payload GC (Store.PayloadStore.collectGarbage) must never race with capture: a file written by store() before its row is inserted must survive GC. Serialize them (one actor or queue owns both) or skip files younger than a grace period. Keep payload hashes and thumbnail hashes as separate parameters. Do this in the first task that calls collectGarbage.
+const DECISIONS = `Maintainer decisions (updated 2026-11-23, after the v0.1.0 release). Record each one in the doc it belongs to the first time a task depends on it:
+- v0.1.0 is released and people run it. Never edit an existing migration in Store/AppDatabase.swift; any schema change is a new registered migration (v2_…, v3_…) with a test that migrates a v1 database. Keep \`card.content_hash\` UNIQUE: capture dedupe relies on it.
+- Duplicate is not in v1 (roadmap "Needs the maintainer" → Decided); do not build it.
+- The maintainer uses the released Clipsy daily on this Mac, and until T14.8 lands the Debug build shares its bundle id, database, UserDefaults and hotkeys. Never launch Clipsy.app, never open or write ~/Library/Application Support/Clipsy or the app.gonar.clipsy defaults domain, and never run tccutil. Tests use temporary directories and private pasteboards only.
+- Releases are live: the release secrets are set and .github/workflows/release.yml publishes on vX.Y.Z tags. Never tag, release, or change the signing, notarization or Sparkle key wiring unless the task says so. CI builds on the xcode-27 runner with Xcode 27.2.
+- URL scheme: "clipsy", grammar in docs/product.md §3.7.
+- Linking: the app links only the ClipsyKit product. Re-export what the app needs from ClipsyKit (\`@_exported import\`). A minimal project.pbxproj edit is allowed only to change a build setting; verify it with scripts/build.sh.
+- Payload GC (Store.PayloadStore.collectGarbage) must never race with capture: a file written by store() before its row is inserted must survive GC.
 - Tests and debug code never touch NSPasteboard.general: inject the pasteboard and use a uniquely named private NSPasteboard in tests. The maintainer's real clipboard must never be read or changed.
 - Any other product question: choose what a first-party macOS app would do, follow docs/ and Apple's Human Interface Guidelines, record the choice as a working default in docs/roadmap.md, and carry on. Never block on a question you can answer yourself.`
 
