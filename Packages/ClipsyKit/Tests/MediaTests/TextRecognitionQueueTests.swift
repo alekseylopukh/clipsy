@@ -20,7 +20,11 @@ struct TextRecognitionQueueTests {
         repository = try CardRepository(database: AppDatabase(directory: directory))
     }
 
-    @Test func `ocr text is searchable`() async throws {
+    @Test(.disabled(
+        if: ProcessInfo.processInfo.environment["CI"] != nil,
+        "Vision finds no text on the GitHub runner VM"
+    ))
+    func `ocr text is searchable`() async throws {
         let id = try await recordImage(Self.renderedText("Quarterly invoice"))
         let queue = TextRecognitionQueue(repository: repository)
         await queue.setEnabled(true)
