@@ -8,7 +8,7 @@ Clipsy is an open-source, native macOS clipboard manager. It has the same featur
 - **Sync:** none for now. The data layer is local-only.
 - **License:** GPL-3.0. Code may be reused from MIT, BSD, Apache-2.0 or GPL-3.0 projects, keeping their notices. Never from AGPL or proprietary sources.
 - **Distribution:** GitHub Releases plus the author's site. Signed with Developer ID and notarized. Not sandboxed, because direct paste needs Accessibility. No Mac App Store build.
-- **Identity:** bundle id `app.gonar.clipsy`. It is an agent app (`LSUIElement`) with a menu bar item.
+- **Identity:** an agent app (`LSUIElement`) with a menu bar item. Bundle ids, display names and URL schemes per build configuration: [architecture §6.1](docs/architecture.md#61-layout).
 - **Project:** a committed `Clipsy.xcodeproj`. `App/` is a synchronized folder, so files added there need no project edits. All other code lives in `Packages/ClipsyKit`, whose single umbrella product `ClipsyKit` is what the app links. A new module therefore touches only `Package.swift`. Never hand-edit `project.pbxproj` except to change a build setting.
 - **Dependencies:** pre-approved: GRDB, KeyboardShortcuts and Sparkle. Add another package only when it is clearly better than writing the code yourself and its license is GPL-compatible. Record every package in THIRD_PARTY_NOTICES.md.
 - **Privacy:** no telemetry. The only network calls are link previews and Sparkle update checks, and both are opt-in. "Check for Updates…" is always manual.

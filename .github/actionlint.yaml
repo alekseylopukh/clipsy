@@ -1,0 +1,4 @@
+self-hosted-runner:
+  # the custom macOS runner label used by build.yml and release.yml
+  labels:
+    - xcode-27

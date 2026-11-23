@@ -97,7 +97,7 @@ Local-only. No sync fields, no UUIDs, no tombstones: integer row IDs are enough.
   Backups/Damaged Store <date time>/           a damaged store moved aside at launch (§3.4)
 ```
 
-Working default [WD-18](roadmap.md#working-defaults-for-open-todos): the directory is `~/Library/Application Support/Clipsy/` (`AppDatabase.defaultDirectory`).
+Working default [WD-18](roadmap.md#working-defaults-for-open-todos): `AppDatabase.defaultDirectory(bundleIdentifier:)` derives the directory from the app's bundle id. The released id `app.gonar.clipsy` keeps `~/Library/Application Support/Clipsy/`, so released data stays where it is; any other id, such as a dev build's, uses `~/Library/Application Support/<bundle id>/`, so it never shares the release's database.
 
 ### 3.2 Schema
 
@@ -171,6 +171,7 @@ Rules:
 
 - GRDB `DatabaseMigrator` with named, append-only migrations (`v1_initial`, `v2_…`). A migration is never edited after it ships in a release.
 - Migrations run at launch before any UI shows. On failure the app shows an error and does not touch the database file.
+- A store with an applied migration this build does not know was written by a newer Clipsy. GRDB's migrator would accept it silently, so `AppDatabase` checks `hasBeenSuperseded` first and throws without writing; the app says a newer version saved the history and quits.
 - A damaged store is the exception: when opening or migrating fails with `SQLITE_CORRUPT` or `SQLITE_NOTADB`, the database files, `Payloads/` and `Thumbnails/` move to `Backups/Damaged Store <date time>/`, a new empty store is created, and an alert tells the user where the backup is, with a "Show in Finder" button.
 - Each migration has a test that builds the previous schema with synthetic rows, migrates, and checks the result.
 - `UserDefaults` key changes get a one-shot migration keyed by a stored settings version.
@@ -288,12 +289,24 @@ Dependency direction: `ShelfUI` → `DesignSystem`, `Pasting`, `Media`, `Store`,
 
 Decided (2026-11-17): a plain, committed `Clipsy.xcodeproj`. `App/` is a folder-synchronized group, so new files there need no project edits. The app links one umbrella product, `ClipsyKit`, so adding a module only changes `Package.swift`. Never hand-edit `project.pbxproj` unless a build setting has to change.
 
+Identity per configuration (T14.8): Release is the shipped app, Debug is "Clipsy Dev", so a dev build never shares the release's UserDefaults, URL scheme, TCC grants, LaunchServices entry or database (§3.1). The app target's build settings set:
+
+| Setting | Release | Debug |
+|---|---|---|
+| `PRODUCT_BUNDLE_IDENTIFIER` | `app.gonar.clipsy` | `app.gonar.clipsy.dev` |
+| `INFOPLIST_KEY_CFBundleDisplayName` | `Clipsy` | `Clipsy Dev` |
+| `CLIPSY_URL_SCHEME` | `clipsy` | `clipsy-dev` |
+
+`PRODUCT_NAME` stays `Clipsy` in both, so the product is `Clipsy.app`. `Config/Info.plist` declares the URL type from `$(CLIPSY_URL_SCHEME)` with `CFBundleURLName = $(PRODUCT_BUNDLE_IDENTIFIER)`. The app reads the scheme from `Bundle.main` and passes it to `URLRoute`, so the [grammar](product.md#37-integrations) is the same under either scheme. The menu bar item's accessibility label and tooltip are the bundle's display name. Only the release bundle id gets Sparkle: `AppUpdater(bundle:)` gives any other id a disabled driver, so a dev build never reads the release feed or writes Sparkle's defaults, and it shows no update UI (T14.10).
+
+Global shortcut defaults (T14.11) follow the bundle id, so a dev build never takes the release's hotkeys: `app.gonar.clipsy` uses the [keyboard map](product.md#5-keyboard-map) defaults, any other id uses ⌃⇧⌘V (Shelf) and ⌃⇧⌘C (Start Sequence) and leaves Paste All unset. Neither dev combination is a macOS symbolic hotkey (checked with `CopySymbolicHotKeys` on macOS 27.2). A default is written only while UserDefaults holds no value for the name, so a dev build that already stored the release defaults keeps them until Restore Defaults.
+
 ### 6.2 Testing
 
 - **Unit (Swift Testing):** classifier, hashing and dedupe rules, ignore rules, size cap, retention SQL, Board deletion, FTS queries (prefix, diacritics), Sequence state machine, migrations.
 - **Pasteboard tests** use private named pasteboards (`NSPasteboard(name:)`), never `.general`.
 - **Fixtures are synthetic.** Never build test data from real clipboard content.
-- **Performance:** seed 100k synthetic Cards, measure search latency and launch time. `PerformanceTests` in `StoreTests` does this on every `scripts/build.sh test` and prints the timings; run it alone with `swift test --package-path Packages/ClipsyKit --filter PerformanceTests` for numbers worth comparing.
+- **Performance:** seed 100k synthetic Cards, measure search latency and launch time. `PerformanceTests` in `StoreTests` does this only when `CLIPSY_PERF=1`, so `scripts/build.sh test` skips it. Run `scripts/perf.sh` before every release and when a change touches the schema or search, and compare its timings with the baseline below.
 - **Manual checklist per release:** direct paste into a native app, a browser, a terminal and an Electron app; non-QWERTY layout; full-screen Space; second display; Accessibility revoked; screen recording hides the Shelf.
 
 Baseline (2026-11-17, Apple M5 Pro, macOS 27.2, debug build, run alone): 100k text and link Cards with 13 words each in History. Search times are the median of five runs.
@@ -316,9 +329,9 @@ Search and history load return every match, so their time grows with the result 
 
 ### 6.3 CI (GitHub Actions)
 
-- Per pull request: lint only, on Linux (`.github/workflows/lint.yml`); it is the required check.
-- By hand (`workflow_dispatch`): macOS runner, select the Xcode version, `scripts/build.sh` and `scripts/build.sh test` (ad-hoc signed, no secrets). macOS runners are slow to start, so builds and tests normally run locally.
-- Cache SPM checkouts.
+- Per pull request: lint only, on Linux (`.github/workflows/lint.yml`); it is the required check. It runs the dynamic `swiftlint` with SourceKit from the runner's preinstalled Swift toolchain, because the static binary skips `custom_rules` such as `no_print`. A smoke test fails the job when SwiftLint skips a rule or passes a file with `print(`.
+- By hand (`workflow_dispatch`): two parallel macOS jobs, ad-hoc signed, no secrets. `app` runs `scripts/build.sh`; `test` runs `swift package resolve` (up to 3 attempts, so a transient clone failure does not fail the run) and then `swift test --disable-xctest` without `--quiet`, so test timings show in the log. macOS runners are slow to start, so builds and tests normally run locally.
+- Each job caches its own SPM checkouts: `app` the xcodebuild `SourcePackages`, `test` the package's `.build/checkouts` and `.build/repositories`.
 - Runner: `xcode-27` (macOS 27, arm64, a preview image) with Xcode 27.2 selected through `DEVELOPER_DIR`, as listed in [actions/runner-images](https://github.com/actions/runner-images). The `macos-26` image tops out at Xcode 26.6, whose Swift 6.3.3 crashes compiling the app. The release workflow uses the same runner. The workflow is `.github/workflows/build.yml`.
 
 > TODO: move `build.yml` and `release.yml` to the GA macOS 27 label once actions/runner-images publishes one; a preview label can be renamed or removed.

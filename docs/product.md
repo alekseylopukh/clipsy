@@ -143,7 +143,7 @@ Decided (2026-11-17): the scheme is `clipsy`. Grammar (designed in T12.2):
 | `clipsy://new?text=<text>` | Opens the Shelf and the New Text Card editor for the current tab, filled with `<text>`. The card is saved only when the user saves it, so a link cannot add cards on its own. If the editor is already open, it is left as it is. |
 | `clipsy://settings` | Opens Settings. |
 
-The scheme and the route are case-insensitive. Values are percent-encoded; `+` is not read as a space. Unknown query items are ignored. Any other route, or a URL with a path, is ignored and logged without its contents.
+The scheme and the route are case-insensitive. Values are percent-encoded; `+` is not read as a space. Unknown query items are ignored. Any other route, or a URL with a path, is ignored and logged without its contents. A Debug build answers to `clipsy-dev` with the same grammar ([architecture §6.1](architecture.md#61-layout)).
 
 ## 4. Behavior rules
 
@@ -354,6 +354,8 @@ Working default [WD-28](roadmap.md#working-defaults-for-open-todos): badges appe
 | Paste next Sequence card | ⌘V (the system shortcut; not registered by us) | v1 |
 | Paste all Sequence cards | ⌃⌥⌘V | v1 |
 
+These are the released app's defaults; the dev build uses [its own](architecture.md#61-layout) so both can run at once.
+
 Decided (2026-11-17): the default shelf shortcut is ⇧⌘V. It takes "Paste and Match Style" away from apps that use it, and users can rebind it in Settings.
 
 Decided (2026-11-17): the default Sequence shortcut is ⇧⌘C (rebindable). It shadows ⇧⌘C in Finder, in browser dev tools and in some editors.
@@ -465,7 +467,7 @@ This is the item list; grouping and wording are in [design.md §7](design.md#7-m
 
 - Open Shelf · New Text Card · Start Sequence
 - Pause Capture for 15 minutes, 1 hour, 8 hours, until tomorrow, or until resumed / Resume Capture; while paused, the time capture resumes. "Until tomorrow" ends at the next midnight. A pause survives relaunch; ⌘T pauses until resumed.
-- Settings… · Check for Updates… (always manual, see [CLAUDE.md](../CLAUDE.md#decisions)) · About Clipsy
+- Settings… · Check for Updates… (always manual, see [CLAUDE.md](../CLAUDE.md#decisions); not in the dev build, [architecture §6.1](architecture.md#61-layout)) · About Clipsy
 - Clipsy Help · Report an Issue
 - Quit Clipsy
 

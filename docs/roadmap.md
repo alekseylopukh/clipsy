@@ -29,7 +29,7 @@ Not maintainer decisions. They are the doc's current text or the simplest choice
 | WD-15 | Compact threshold | Regular card height below 150 pt |
 | WD-16 | System Settings deep links | Use a pane URL only if verified on macOS 26; otherwise open System Settings and say where to go |
 | WD-17 | Own-write marker type | `app.gonar.clipsy.own-write`, declared in `Store` so `Capture` and `Pasting` share it |
-| WD-18 | App Support folder | `~/Library/Application Support/Clipsy/` |
+| WD-18 | App Support folder | `~/Library/Application Support/Clipsy/` for `app.gonar.clipsy`; `~/Library/Application Support/<bundle id>/` for any other id ([architecture §3.1](architecture.md#31-files)) |
 | WD-19 | Update settings location | About pane |
 | WD-20 | Linking new modules into the app | One library product `ClipsyKit` lists every package target; the app links only it. A third-party module reaches the app through a ClipsyKit module that re-exports it with `@_exported import` (KeyboardShortcuts through `ShelfUI`). If the app must link a third-party product directly, stop and ask the maintainer to link it in Xcode. |
 | WD-21 | Clipboard previous contents after paste | Not restored; no `currentHostOnly` |
@@ -784,6 +784,7 @@ Found by the 2026-11-23 audits. These come first because every later task gets f
 - Deliverable: the shortest settle that still makes the test fail when the glass-contrast fix is reverted (prove it by reverting locally, never commit the revert); pixels read through `CGImage` bitmap data; drop `.serialized` only if `SnapshotRenderer` holds no shared state
 - Acceptance: the suite runs in under 6 s locally; reverting the fix still fails it
 - Size: S
+- Status: done
 
 ### T14.2 Performance tests run on demand
 - Module(s): StoreTests, scripts, CONTRIBUTING
@@ -792,6 +793,7 @@ Found by the 2026-11-23 audits. These come first because every later task gets f
 - Deliverable: the suite runs only when `CLIPSY_PERF=1`; `scripts/perf.sh` runs it alone and prints the timings; architecture §6.2 and the CONTRIBUTING release checklist call `scripts/perf.sh` and compare with the baseline
 - Acceptance: `scripts/build.sh test` no longer runs it; `scripts/perf.sh` does
 - Size: S
+- Status: done
 
 ### T14.3 No empty XCTest phase
 - Module(s): scripts
@@ -800,6 +802,7 @@ Found by the 2026-11-23 audits. These come first because every later task gets f
 - Deliverable: `--disable-xctest` in `scripts/build.sh` test and `scripts/snapshots.sh`
 - Acceptance: both scripts pass; `scripts/test-commit-gate.sh` stays green
 - Size: S
+- Status: done
 
 ### T14.4 GitHub Actions on Node 24
 - Module(s): CI
@@ -808,6 +811,7 @@ Found by the 2026-11-23 audits. These come first because every later task gets f
 - Deliverable: `actions/checkout@v7` and `actions/cache@v6` in lint.yml, build.yml and release.yml; release.yml keeps `persist-credentials: false`; verify the newest major versions with `gh api repos/actions/<name>/releases/latest` first
 - Acceptance: workflows lint clean (`actionlint` if available); no Node 20 annotation on the next run
 - Size: S
+- Status: done
 
 ### T14.5 SwiftLint with SourceKit in CI
 - Module(s): CI
@@ -816,6 +820,7 @@ Found by the 2026-11-23 audits. These come first because every later task gets f
 - Deliverable: the dynamic `swiftlint` binary with SourceKit available on the runner (from the same release zip, or `swift-actions/setup-swift`); the smoke test fails the job when a file with `print(` passes or when the output contains "Skipping enabled rule"
 - Acceptance: the Lint job runs every rule; the smoke test catches `print(`
 - Size: S
+- Status: done
 
 ### T14.6 Parallel CI Build
 - Module(s): CI, docs
@@ -824,6 +829,7 @@ Found by the 2026-11-23 audits. These come first because every later task gets f
 - Deliverable: two parallel jobs, `app` (scripts/build.sh) and `test` (`swift package resolve` retried up to 3 times, then `swift test --disable-xctest` without `--quiet`), each with its own cache; architecture §6.3 matches
 - Acceptance: the Build workflow passes on the branch; wall time noted in the PR
 - Size: S
+- Status: done
 
 ### T14.7 Data directory from the bundle id
 - Module(s): Store, App
@@ -832,6 +838,7 @@ Found by the 2026-11-23 audits. These come first because every later task gets f
 - Deliverable: the directory derives from the bundle id: `app.gonar.clipsy` keeps `Clipsy` (released data stays where it is), any other id uses a folder named after the id; architecture §3.1 and WD-18 updated
 - Acceptance: unit tests for both ids; the release path is unchanged
 - Size: S
+- Status: done
 
 ### T14.8 Debug runs as Clipsy Dev
 - Module(s): App, ShelfUI, build settings
@@ -841,6 +848,7 @@ Found by the 2026-11-23 audits. These come first because every later task gets f
 - Acceptance: `URLRouteTests` cover both schemes; a Debug build's Info.plist shows the dev id and scheme; a Release build's shows the released ones (check with `plutil` on both products, without launching)
 - Human check: with the installed release running, launch the Debug build: two menu bar icons, a separate Accessibility prompt for Clipsy Dev, `clipsy-dev://open` opens Dev and `clipsy://open` opens the release
 - Size: S
+- Status: done
 
 ### T14.9 Refuse a database from a newer version
 - Module(s): Store, App
@@ -849,6 +857,7 @@ Found by the 2026-11-23 audits. These come first because every later task gets f
 - Deliverable: `AppDatabase` checks `migrator.hasBeenSuperseded` before migrating and throws without touching the files; the app shows an alert and quits
 - Acceptance: test with a database that has an extra `v99` migration: the open throws and the files are unchanged
 - Size: S
+- Status: done
 
 ### T14.10 No Sparkle in the dev build
 - Module(s): Updates, App
@@ -857,6 +866,7 @@ Found by the 2026-11-23 audits. These come first because every later task gets f
 - Deliverable: one factory picks the driver and both call sites use it (`SparkleUpdaterDriver()` is created in App/ClipsyApp.swift and App/SettingsView.swift today); when the bundle id is not `app.gonar.clipsy` it returns a no-op `UpdaterDriver`, and "Check for Updates…" and the About updates section are hidden
 - Acceptance: unit test for the driver choice
 - Size: S
+- Status: done
 
 ### T14.11 Dev default hotkeys
 - Module(s): ShelfUI
@@ -865,6 +875,7 @@ Found by the 2026-11-23 audits. These come first because every later task gets f
 - Deliverable: in the dev build the defaults are ⌃⇧⌘V (Shelf) and ⌃⇧⌘C (Sequence) and paste-all has none; check they collide with no system shortcut
 - Acceptance: unit test for both builds' defaults
 - Size: S
+- Status: done
 
 ### T14.12 Test target warnings
 - Module(s): Package.swift, DesignSystem, ShelfUI tests
@@ -873,6 +884,7 @@ Found by the 2026-11-23 audits. These come first because every later task gets f
 - Deliverable: exclude `App/AppIcon.icon` in the SnapshotTests target; `nonisolated static` for the pure helpers in `SwatchValueLabel.swift` and `CardFooter.swift`; the filter tests keep the function-key bit a real arrow press carries (see the comment in ShelfModel+Filters.swift) without calling the deprecated `.function` symbol, for example through `EventModifiers(rawValue:)` with a one-line comment
 - Acceptance: `swift build --build-tests` prints no warnings
 - Size: S
+- Status: done
 
 ## Needs the maintainer
 

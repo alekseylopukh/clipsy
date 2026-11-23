@@ -125,7 +125,7 @@ struct ClipsyApp: App {
     }
 
     private static func startUpdater() -> AppUpdater {
-        let updater = AppUpdater(driver: SparkleUpdaterDriver())
+        let updater = AppUpdater(bundle: .main)
         do {
             try updater.startIfAutomatic()
         } catch {
@@ -295,8 +295,10 @@ struct ClipsyApp: App {
     /// migrations must finish before any UI shows (architecture §3.4), so this runs synchronously at launch
     private static func openDatabase() -> AppDatabase {
         let logger = Logger(subsystem: "app.gonar.clipsy", category: "Startup")
+        guard let bundleIdentifier = Bundle.main.bundleIdentifier else { fatalError("the app has a bundle id") }
         do {
-            let opened = try AppDatabase.openRecoveringDamagedStore(directory: AppDatabase.defaultDirectory)
+            let directory = AppDatabase.defaultDirectory(bundleIdentifier: bundleIdentifier)
+            let opened = try AppDatabase.openRecoveringDamagedStore(directory: directory)
             if let backup = opened.backupDirectory {
                 logger.error("the database was damaged and was moved aside")
                 showRecoveryAlert(backup: backup)
@@ -304,12 +306,7 @@ struct ClipsyApp: App {
             return opened.database
         } catch {
             logger.fault("opening the database failed: \(String(describing: type(of: error)), privacy: .public)")
-            let alert = NSAlert(error: error)
-            alert.messageText = String(localized: "Clipsy can’t open its clipboard history.")
-            alert.informativeText = error.localizedDescription
-            alert.addButton(withTitle: String(localized: "Quit Clipsy"))
-            NSApplication.shared.activate()
-            alert.runModal()
+            showOpenFailureAlert(error)
             exit(EXIT_FAILURE)
         }
     }
@@ -327,5 +324,18 @@ struct ClipsyApp: App {
         if alert.runModal() == .alertSecondButtonReturn {
             NSWorkspace.shared.activateFileViewerSelecting([backup])
         }
+    }
+}
+
+private extension ClipsyApp {
+    static func showOpenFailureAlert(_ error: any Error) {
+        let alert = NSAlert(error: error)
+        alert.messageText = String(localized: "Clipsy can’t open its clipboard history.")
+        alert.informativeText = error is AppDatabase.SupersededError
+            ? String(localized: "It was saved by a newer version of Clipsy. Install the latest version to open it.")
+            : error.localizedDescription
+        alert.addButton(withTitle: String(localized: "Quit Clipsy"))
+        NSApplication.shared.activate()
+        alert.runModal()
     }
 }

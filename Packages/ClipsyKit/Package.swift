@@ -42,7 +42,7 @@ let package = Package(
             dependencies: ["Capture", "DesignSystem", "Media", "Pasting", "ShelfUI", "Store", "Updates"],
             // `App` is a symlink to the app target's folder; a new file there belongs in `sources` or `exclude`
             exclude: [
-                "App/AppDelegate.swift", "App/ClipsyApp.swift", "App/ClipsyApp+URLScheme.swift",
+                "App/AppDelegate.swift", "App/AppIcon.icon", "App/ClipsyApp.swift", "App/ClipsyApp+URLScheme.swift",
                 "App/PasteboardAccessAlert.swift", "App/SettingsWindow.swift", "App/StatusItemController.swift",
                 "App/Intents", "App/Sounds", "App/Credits.rtf", "App/Localizable.xcstrings"
             ],
@@ -50,6 +50,7 @@ let package = Package(
                 "AppSnapshotTests.swift", "ComponentGallerySnapshotTests.swift", "PopoverSnapshotTests.swift",
                 "SearchSuggestionLayerTests.swift", "ShelfContrastTests.swift", "ShelfSnapshotTests.swift",
                 "SnapshotFixtures.swift", "SnapshotRenderer.swift",
+                "MarketingDesktop.swift", "MarketingFixtures.swift", "MarketingSnapshotTests.swift",
                 "App/SettingsView.swift", "App/GeneralSettingsView.swift", "App/ShortcutsSettingsView.swift",
                 "App/PrivacySettingsView.swift", "App/AboutSettingsView.swift", "App/AcknowledgementsView.swift",
                 "App/OnboardingView.swift", "App/PermissionStatusLabel.swift", "App/MenuBarSettings.swift",

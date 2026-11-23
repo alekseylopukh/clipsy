@@ -3,6 +3,7 @@ import GRDB
 import Testing
 @testable import Store
 
+@Suite(.enabled(if: ProcessInfo.processInfo.environment["CLIPSY_PERF"] == "1"))
 struct PerformanceTests {
     static let cardCount = 100_000
     static let words = (0 ..< 400).map { "w\(String($0, radix: 36))tok" }

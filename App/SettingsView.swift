@@ -42,6 +42,6 @@ enum SettingsPane: String {
             .environment(PasteboardAccess(pasteboard: NSPasteboard.withUniqueName()))
             .environment(MenuBarSettings())
             .environment(ShortcutSettings(store: KeyboardShortcutsStore()))
-            .environment(AppUpdater(driver: SparkleUpdaterDriver()))
+            .environment(AppUpdater(bundle: .main))
     }
 }

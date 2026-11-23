@@ -55,6 +55,30 @@ struct AppDatabaseRecoveryTests {
         #expect(try storeContents(of: AppDatabase(directory: directory)) == original)
     }
 
+    @Test func `newer store is refused without touching files`() throws {
+        var newer = AppDatabase.migrator
+        newer.registerMigration("v99_future") { connection in
+            try connection.execute(sql: "CREATE TABLE future (id INTEGER PRIMARY KEY)")
+        }
+        _ = try AppDatabase(directory: directory, migrator: newer)
+        let original = try fileContents()
+
+        #expect(throws: AppDatabase.SupersededError.self) {
+            try AppDatabase.openRecoveringDamagedStore(directory: directory)
+        }
+
+        #expect(try fileContents() == original)
+    }
+
+    private func fileContents() throws -> [String: Data] {
+        // -shm is sqlite's shared-memory index, which every reader rewrites
+        let names = try FileManager.default.contentsOfDirectory(atPath: directory.path(percentEncoded: false))
+            .filter { $0 != "clipsy.sqlite-shm" }
+        return try Dictionary(uniqueKeysWithValues: names.map { name in
+            try (name, Data(contentsOf: directory.appending(path: name)))
+        })
+    }
+
     private func storeContents(of database: AppDatabase) throws -> [String] {
         try database.pool.read { connection in
             try String.fetchAll(connection, sql: "SELECT sql FROM sqlite_master WHERE sql IS NOT NULL ORDER BY name")

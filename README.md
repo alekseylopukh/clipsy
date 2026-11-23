@@ -1,57 +1,121 @@
+<div align="center">
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/images/icon-dark.png">
+  <img src="docs/images/icon-light.png" width="128" height="128" alt="Clipsy app icon">
+</picture>
+
 # Clipsy
 
-A free, open-source clipboard manager for macOS that feels like part of the system.
+**A clipboard manager for macOS that feels like part of the system.**
 
-Clipsy keeps everything you copy on a shelf at the bottom of the screen: text, links, images, files and colors. Search it, organize it into boards and paste anything back with a keystroke.
+<a href="https://github.com/alekseylopukh/clipsy/releases/latest"><img src="https://img.shields.io/badge/Download_for_macOS-0A84FF?style=for-the-badge" alt="Download for macOS"></a>
 
-> **Status:** no release yet. The first build will be published on [GitHub Releases](https://github.com/alekseylopukh/clipsy/releases).
+Free · Open source · macOS 26+
+
+</div>
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/images/shelf-dark.png">
+  <img src="docs/images/shelf-light.png" alt="The Clipsy Shelf at the bottom of a Mac desktop, showing cards for a note, a link with a preview image, a photo, a color, a code snippet and a file">
+</picture>
+
+What you copy lands on the Shelf at the bottom of the screen: text, links, images, files and colors. Press ⇧⌘V, find what you need and paste it back with Return.
+
+## Why Clipsy
+
+- **It looks like macOS.** System controls, SF Symbols, Liquid Glass, light and dark mode. No custom theme to get used to.
+- **It's free.** GPL-3.0, with no account, trial, subscription or upsell.
+- **Your history stays on your Mac.** No telemetry and no sync. See [Privacy](#privacy).
+- **It works from the keyboard.** Open, search, pick and paste without touching the mouse.
+
+## A quick tour
+
+### Search with filters
+
+Type to search everything you've copied, including text inside images. Narrow it down with filters for type, app, date and board.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/images/search-dark.png">
+  <img src="docs/images/search-light.png" alt="Searching the Shelf for “Lisbon” with a Last 7 Days filter; matches are highlighted in a note, a message, a link and a file">
+</picture>
+
+### Boards
+
+Keep snippets you reuse on colored boards. Cards on a board never expire.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/images/board-dark.png">
+  <img src="docs/images/board-light.png" alt="The Snippets board with a saved reply, an address, a terminal command, a color and a link">
+</picture>
+
+### Sequence
+
+Collect several items, then paste them one after another with ⌘V, for example to fill in a form.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/images/sequence-dark.png">
+  <img src="docs/images/sequence-light.png" alt="The Sequence panel in the corner of the screen with three items left to paste into a form">
+</picture>
+
+### Privacy settings
+
+Passwords, temporary content and apps you choose are never recorded.
+
+<p align="center">
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/images/privacy-dark.png">
+  <img src="docs/images/privacy-light.png" width="600" alt="Clipsy's Privacy settings: ignore passwords and temporary content, ignored apps, text recognition, link previews and screen sharing">
+</picture>
+</p>
 
 ## Features
 
-- Clipboard history with retention from one day to forever
-- A shelf of cards with previews for each content type
-- Boards for keeping snippets you reuse
-- Search across History and boards
-- Paste directly into the frontmost app, or as plain text
-- Quick paste with numbered shortcuts
-- Sequential pasting of several items
-- Editing of text, link and color cards, and custom card titles
-- Search inside images through on-device text recognition
-- Optional link previews
-- Privacy controls: ignored apps, password managers, concealed and transient content and text that looks like a secret are skipped; capture can be paused from the menu bar
-- Shortcuts actions and a `clipsy://` URL scheme
-- No account, no telemetry, no sync. Your history stays on your Mac; the only network requests are link previews and update checks, and both are off until you turn them on.
+| | |
+|---|---|
+| **History** | Every copy is kept with all its formats, so rich text and images paste back intact. Keep it from a day to forever. [More](docs/product.md#31-capture-and-history) |
+| **Shelf and cards** | Previews for each type, Quick Look, editing of text, links and colors, custom titles, drag and drop. [More](docs/product.md#32-shelf-and-cards) |
+| **Pasting** | Paste into the app you were using, as plain text, or with ⌘1…⌘9. [More](docs/product.md#33-pasting) |
+| **Sequence** | Paste a queue of items in order. [More](docs/product.md#34-sequence) |
+| **Boards** | Named, colored collections that stay until you remove them. [More](docs/product.md#35-boards) |
+| **Search** | Instant search with filters and text recognized in images. [More](docs/product.md#36-search) |
+| **Automation** | Shortcuts actions and a `clipsy://` URL scheme. [More](docs/product.md#37-integrations) |
 
-The full behavior is described in [docs/product.md](docs/product.md).
+Every shortcut is in the [keyboard map](docs/product.md#5-keyboard-map).
 
-## Requirements
+## Privacy
 
-macOS 26 or later.
+- No account, no telemetry, no analytics, no sync. Your history is stored only on your Mac.
+- Clipsy makes two kinds of network request: link previews and update checks. Both are off until you turn them on.
+- Passwords and other concealed content, temporary content and ignored apps are skipped. So is text that looks like a token or key.
+- Capture can be paused from the menu bar, and the Shelf is hidden from screenshots and screen sharing by default.
+
+All privacy settings are listed in [docs/product.md](docs/product.md#privacy).
 
 ## Install
 
 1. Download `Clipsy-<version>.dmg` from the [latest release](https://github.com/alekseylopukh/clipsy/releases/latest).
 2. Open the disk image and drag Clipsy to Applications.
-3. Open Clipsy from Applications. It runs in the menu bar and has no Dock icon.
+3. Open Clipsy. It lives in the menu bar and has no Dock icon.
 
-Releases are signed with a Developer ID and notarized by Apple. On first launch macOS shows its usual "downloaded from the Internet" confirmation and no "unidentified developer" block.
+Releases are signed with a Developer ID and notarized by Apple, so macOS shows only its usual "downloaded from the Internet" confirmation.
 
 ### Using Clipsy
 
-Press ⇧⌘V to show or hide the shelf. This takes over "Paste and Match Style" in apps that use that shortcut; change it in Settings › Shortcuts. ⇧⌘C starts a Sequence and ⌃⌥⌘V pastes every card in it. All shortcuts are listed in the [keyboard map](docs/product.md#5-keyboard-map).
+Press ⇧⌘V to show or hide the Shelf. This takes over "Paste and Match Style" in apps that use that shortcut; change it in Settings › Shortcuts. ⇧⌘C starts a Sequence and ⌃⌥⌘V pastes every card in it.
 
 ### Permissions
 
 - **Accessibility** lets Clipsy paste straight into the app you were using. A Sequence started from another app also needs it to copy your selection. Without it, Clipsy puts the item on the clipboard and you press ⌘V yourself. Grant it in System Settings › Privacy & Security › Accessibility. If you skip it, Clipsy asks again on the first paste; choose "Don't ask again" to stay in copy-only mode.
 - **Paste from Other Apps:** macOS may ask before Clipsy reads what you copy, or block it. Set Clipsy to Allow in System Settings › Privacy & Security › Paste from Other Apps, or your history will miss items.
 
-On first launch a short setup window lets you set the shelf shortcut, asks for Accessibility, asks for clipboard access if macOS restricts it, and offers Open at login, history length and link previews. Every step can be skipped.
+On first launch a short setup window sets the Shelf shortcut, asks for these permissions and offers Open at login, history length and link previews. Every step can be skipped.
 
 If pasting stops working after an update or a reinstall, remove Clipsy from the Accessibility list and add it again. macOS ties the permission to the app's signature.
 
 ### Updates
 
-Clipsy never checks for updates on its own unless you turn on automatic checks in Settings › About. "Check for Updates…" in that pane or in the menu bar menu checks once. Updates are signed and verified before they install.
+Clipsy never checks for updates on its own unless you turn on automatic checks in Settings › About. "Check for Updates…" there or in the menu bar menu checks once. Updates are signed and verified before they install.
 
 ### Uninstall
 
@@ -76,7 +140,7 @@ A Debug build needs no Apple developer account. Without an Apple Development ide
 
 Release builds are made by `scripts/release/release.sh`, which needs the maintainer's signing and notarization secrets. `scripts/release/release.sh --dry-run <version> <build-number>` runs the whole pipeline without them. See [architecture §6.4](docs/architecture.md#64-release-pipeline).
 
-To contribute, start with [CONTRIBUTING.md](CONTRIBUTING.md).
+The screenshots above are rendered from made-up data; [docs/images](docs/images/README.md) explains how to regenerate them. To contribute, start with [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## License
 
