@@ -829,6 +829,7 @@ Found by the 2026-11-23 audits. These come first because every later task gets f
 - Deliverable: two parallel jobs, `app` (scripts/build.sh) and `test` (`swift package resolve` retried up to 3 times, then `swift test --disable-xctest` without `--quiet`), each with its own cache; architecture §6.3 matches
 - Acceptance: the Build workflow passes on the branch; wall time noted in the PR
 - Size: S
+- Status: done
 
 ### T14.7 Data directory from the bundle id
 - Module(s): Store, App

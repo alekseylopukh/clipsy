@@ -15,8 +15,23 @@ env:
   DEVELOPER_DIR: /Applications/Xcode_27.2.app/Contents/Developer
 
 jobs:
-  build:
-    name: Build and test
+  app:
+    name: Build the app
+    runs-on: xcode-27
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+      - name: Cache SPM checkouts
+        uses: actions/cache@v6
+        with:
+          path: .build/DerivedData/SourcePackages
+          key: spm-app-${{ runner.os }}-${{ hashFiles('Packages/ClipsyKit/Package.swift', 'Packages/ClipsyKit/Package.resolved') }}
+          restore-keys: spm-app-${{ runner.os }}-
+      - name: Build the app
+        run: scripts/build.sh
+
+  test:
+    name: Run the tests
     runs-on: xcode-27
     timeout-minutes: 30
     steps:
@@ -25,12 +40,17 @@ jobs:
         uses: actions/cache@v6
         with:
           path: |
-            .build/DerivedData/SourcePackages
             Packages/ClipsyKit/.build/checkouts
             Packages/ClipsyKit/.build/repositories
-          key: spm-${{ runner.os }}-${{ hashFiles('Packages/ClipsyKit/Package.swift', 'Packages/ClipsyKit/Package.resolved') }}
-          restore-keys: spm-${{ runner.os }}-
-      - name: Build the app
-        run: scripts/build.sh
+          key: spm-test-${{ runner.os }}-${{ hashFiles('Packages/ClipsyKit/Package.swift', 'Packages/ClipsyKit/Package.resolved') }}
+          restore-keys: spm-test-${{ runner.os }}-
+      - name: Resolve packages
+        run: |
+          for attempt in 1 2 3; do
+            swift package resolve --package-path Packages/ClipsyKit && exit 0
+            echo "::warning::swift package resolve failed (attempt $attempt of 3)"
+            sleep $((attempt * 10))
+          done
+          exit 1
       - name: Run the tests
-        run: scripts/build.sh test
+        run: swift test --package-path Packages/ClipsyKit --disable-xctest

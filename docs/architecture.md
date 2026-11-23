@@ -317,8 +317,8 @@ Search and history load return every match, so their time grows with the result 
 ### 6.3 CI (GitHub Actions)
 
 - Per pull request: lint only, on Linux (`.github/workflows/lint.yml`); it is the required check. It runs the dynamic `swiftlint` with SourceKit from the runner's preinstalled Swift toolchain, because the static binary skips `custom_rules` such as `no_print`. A smoke test fails the job when SwiftLint skips a rule or passes a file with `print(`.
-- By hand (`workflow_dispatch`): macOS runner, select the Xcode version, `scripts/build.sh` and `scripts/build.sh test` (ad-hoc signed, no secrets). macOS runners are slow to start, so builds and tests normally run locally.
-- Cache SPM checkouts.
+- By hand (`workflow_dispatch`): two parallel macOS jobs, ad-hoc signed, no secrets. `app` runs `scripts/build.sh`; `test` runs `swift package resolve` (up to 3 attempts, so a transient clone failure does not fail the run) and then `swift test --disable-xctest` without `--quiet`, so test timings show in the log. macOS runners are slow to start, so builds and tests normally run locally.
+- Each job caches its own SPM checkouts: `app` the xcodebuild `SourcePackages`, `test` the package's `.build/checkouts` and `.build/repositories`.
 - Runner: `xcode-27` (macOS 27, arm64, a preview image) with Xcode 27.2 selected through `DEVELOPER_DIR`, as listed in [actions/runner-images](https://github.com/actions/runner-images). The `macos-26` image tops out at Xcode 26.6, whose Swift 6.3.3 crashes compiling the app. The release workflow uses the same runner. The workflow is `.github/workflows/build.yml`.
 
 > TODO: move `build.yml` and `release.yml` to the GA macOS 27 label once actions/runner-images publishes one; a preview label can be renamed or removed.
