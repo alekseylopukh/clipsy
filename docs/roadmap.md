@@ -808,6 +808,7 @@ Found by the 2026-11-23 audits. These come first because every later task gets f
 - Deliverable: `actions/checkout@v7` and `actions/cache@v6` in lint.yml, build.yml and release.yml; release.yml keeps `persist-credentials: false`; verify the newest major versions with `gh api repos/actions/<name>/releases/latest` first
 - Acceptance: workflows lint clean (`actionlint` if available); no Node 20 annotation on the next run
 - Size: S
+- Status: done
 
 ### T14.5 SwiftLint with SourceKit in CI
 - Module(s): CI
