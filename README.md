@@ -22,8 +22,6 @@ Free · Open source · macOS 26+
 
 What you copy lands on the Shelf at the bottom of the screen: text, links, images, files and colors. Press ⇧⌘V, find what you need and paste it back with Return.
 
-> **Status:** no release yet. The first build will be published on [GitHub Releases](https://github.com/alekseylopukh/clipsy/releases).
-
 ## Why Clipsy
 
 - **It looks like macOS.** System controls, SF Symbols, Liquid Glass, light and dark mode. No custom theme to get used to.
