@@ -31,7 +31,7 @@ struct GeneralSettingsView: View {
                     } label: {
                         LabelWithNote(
                             Text("Needs your approval"),
-                            note: Text("Allow Clipsy in System Settings › General › Login Items.")
+                            note: Text("Allow Clipsy in System Settings › General › Login Items & Extensions.")
                         )
                     }
                 }

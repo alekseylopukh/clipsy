@@ -10,6 +10,8 @@ Conventions:
 
 Clipsy is a clipboard manager for macOS 26 and later. It keeps a history of everything the user copies, shows it in a panel at the bottom of the screen, lets the user organize items into boards, search them, edit them and paste them into any app.
 
+The interface is in English, Russian, Ukrainian, Polish, German and French, following the language set in macOS.
+
 ### Non-goals
 
 | Out of scope | Note |
