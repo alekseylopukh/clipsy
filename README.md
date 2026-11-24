@@ -80,6 +80,7 @@ Passwords, temporary content and apps you choose are never recorded.
 | **Boards** | Named, colored collections that stay until you remove them. [More](docs/product.md#35-boards) |
 | **Search** | Instant search with filters and text recognized in images. [More](docs/product.md#36-search) |
 | **Automation** | Shortcuts actions and a `clipsy://` URL scheme. [More](docs/product.md#37-integrations) |
+| **Languages** | English, Russian, Ukrainian, Polish, German and French. [More](docs/product.md#1-scope) |
 
 Every shortcut is in the [keyboard map](docs/product.md#5-keyboard-map).
 

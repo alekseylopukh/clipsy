@@ -23,6 +23,7 @@ Each fact lives in exactly one place. To change it, edit it there and link to it
 | UI and visual design | [docs/design.md](docs/design.md) |
 | Modules, stack, data model, release pipeline | [docs/architecture.md](docs/architecture.md) |
 | Git workflow, PRs, releases | [CONTRIBUTING.md](CONTRIBUTING.md) |
+| Translations and per-language glossaries | [docs/localization](docs/localization/README.md) |
 | Vendored code and skills | [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) |
 
 ## Working rules
